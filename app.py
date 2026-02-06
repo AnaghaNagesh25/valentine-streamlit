@@ -4,110 +4,85 @@ components.html("""
 <!DOCTYPE html>
 <html>
 <head>
-<style>
-canvas {
-  background: linear-gradient(#ffd1ea, #ff9fcf);
-  border-radius: 20px;
-  box-shadow: 0 15px 30px rgba(255,105,180,0.4);
-}
-button {
-  background:#ff6fae;
-  border:none;
-  padding:12px 20px;
-  border-radius:20px;
-  color:white;
-  font-size:16px;
-  cursor:pointer;
-}
-</style>
+  <style>
+    body { margin:0; background:transparent; overflow:hidden; }
+  </style>
 </head>
 <body>
-
-<h2 style="color:#5b0036;text-align:center;">
-Run Toward Forever 💗
-</h2>
-
-<canvas id="game" width="600" height="200"></canvas>
-<br><br>
-<div style="text-align:center;">
-<button onclick="jump()">JUMP 💕</button>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
 <script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
+camera.position.z = 6;
 
-let y = 140;
-let vy = 0;
-let gravity = 1.2;
-let grounded = true;
-let heartX = 550;
-let gameWon = false;
+const renderer = new THREE.WebGLRenderer({ alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-const playerImg = new Image();
-playerImg.src = "buhb.jpeg";
+// 💗 Heart
+const heartShape = new THREE.Shape();
+heartShape.moveTo(0,0);
+heartShape.bezierCurveTo(0,0,-1.5,-1.5,-3,0);
+heartShape.bezierCurveTo(-4.5,2,0,4,0,6);
+heartShape.bezierCurveTo(0,4,4.5,2,3,0);
+heartShape.bezierCurveTo(1.5,-1.5,0,0,0,0);
 
-const heartImg = new Image();
-heartImg.src = "https://i.imgur.com/Qp5ZQ9M.png"; // glossy heart
+const heartGeo = new THREE.ExtrudeGeometry(heartShape,{
+  depth:0.6,
+  bevelEnabled:true,
+  bevelThickness:0.2,
+  bevelSize:0.2
+});
 
-function jump(){
-  if(grounded){
-    vy = -15;
-    grounded = false;
-  }
+const heartMat = new THREE.MeshStandardMaterial({
+  color:0xff6fae,
+  metalness:0.6,
+  roughness:0.2
+});
+
+const heart = new THREE.Mesh(heartGeo, heartMat);
+heart.scale.set(0.25,0.25,0.25);
+scene.add(heart);
+
+// 🪽 Wings
+function createWing(side){
+  const wingGeo = new THREE.PlaneGeometry(3,2,12,12);
+  const wingMat = new THREE.MeshStandardMaterial({
+    color:0xffc1dc,
+    side:THREE.DoubleSide,
+    transparent:true,
+    opacity:0.85
+  });
+  const wing = new THREE.Mesh(wingGeo, wingMat);
+  wing.position.x = side * 2.2;
+  wing.rotation.y = side * Math.PI/6;
+  return wing;
 }
 
-function drawHeart(){
-  ctx.save();
-  ctx.translate(heartX, 120);
-  ctx.scale(1.6,1.6);
-  ctx.shadowColor = "#ff4fa3";
-  ctx.shadowBlur = 20;
-  ctx.drawImage(heartImg, -30, -30, 60, 60);
-  ctx.restore();
+const leftWing = createWing(-1);
+const rightWing = createWing(1);
+scene.add(leftWing);
+scene.add(rightWing);
+
+// 💡 Light
+const light = new THREE.PointLight(0xffffff,1.5);
+light.position.set(5,5,5);
+scene.add(light);
+
+const ambient = new THREE.AmbientLight(0xffb6d9,1);
+scene.add(ambient);
+
+let t = 0;
+function animate(){
+  requestAnimationFrame(animate);
+  t += 0.03;
+  heart.rotation.y += 0.01;
+
+  leftWing.rotation.z = Math.sin(t)*0.2;
+  rightWing.rotation.z = -Math.sin(t)*0.2;
+
+  renderer.render(scene,camera);
 }
-
-function update(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  // Player physics
-  y += vy;
-  vy += gravity;
-  if(y >= 140){
-    y = 140;
-    vy = 0;
-    grounded = true;
-  }
-
-  // Ground
-  ctx.fillStyle = "#ff8fcf";
-  ctx.fillRect(0,170,600,30);
-
-  // Player
-  ctx.drawImage(playerImg, 50, y, 40, 40);
-
-  // Heart movement
-  if(!gameWon){
-    heartX -= 2;
-  }
-
-  drawHeart();
-
-  // Win condition
-  if(heartX < 90){
-    gameWon = true;
-    ctx.fillStyle = "#5b0036";
-    ctx.font = "20px serif";
-    ctx.fillText("You made it to forever 💗", 180, 90);
-  }
-
-  requestAnimationFrame(update);
-}
-
-update();
+animate();
 </script>
-
-</body>
-</html>
-""", height=360)
 
