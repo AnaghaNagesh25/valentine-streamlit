@@ -1,7 +1,6 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import base64
-import random
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(
@@ -31,8 +30,8 @@ border-radius: 30px;
 text-align: center;
 font-size: 18px;
 color: #5b2b3a;
-box-shadow: 0 15px 40px rgba(0,0,0,0.08);
 line-height:1.6;
+box-shadow: 0 15px 40px rgba(0,0,0,0.08);
 ">
 
 I don’t love you loudly —  
@@ -40,18 +39,16 @@ I love you **deeply**.
 
 In the way my day feels unfinished  
 until I tell you about it.  
-In the way your name feels familiar  
-even in my future.  
 
-You’re my favorite comfort,  
-my soft place to land,  
-my quiet excitement.  
+In the way your name feels  
+like something I’ll always know.  
 
-If this world ever feels heavy,  
-remember —  
-there is someone who chose you  
-in every universe.  
-And it’s me 💗  
+You’re my comfort,  
+my excitement,  
+my favorite person to come home to.  
+
+And if I had to choose again —  
+it would still be you 💗  
 
 </div>
 """, unsafe_allow_html=True)
@@ -60,7 +57,7 @@ And it’s me 💗
 with open("buhb.jpeg", "rb") as f:
     encoded_image = base64.b64encode(f.read()).decode()
 
-# ---------------- 3D HEART SCENE ----------------
+# ---------------- 3D HEART ----------------
 html_heart = f"""
 <!DOCTYPE html>
 <html>
@@ -79,20 +76,25 @@ body {{
 
 <script>
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 100);
+const camera = new THREE.PerspectiveCamera(
+  45,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  100
+);
 camera.position.z = 7;
 
-const renderer = new THREE.WebGLRenderer({{ antialias:true, alpha:true }});
+const renderer = new THREE.WebGLRenderer({{ antialias: true, alpha: true }});
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// lights
+// Lights
 scene.add(new THREE.AmbientLight(0xffffff, 0.9));
 const light = new THREE.PointLight(0xffffff, 1);
-light.position.set(5,5,5);
+light.position.set(5, 5, 5);
 scene.add(light);
 
-// heart shape
+// Heart Shape
 const heartShape = new THREE.Shape();
 heartShape.moveTo(0, 0);
 heartShape.bezierCurveTo(0, 0, -2, 2, -2, 4);
@@ -108,7 +110,10 @@ const geometry = new THREE.ExtrudeGeometry(heartShape, {{
   bevelSegments: 20
 }});
 
-const texture = new THREE.TextureLoader().load("data:image/jpeg;base64,{encoded_image}");
+const texture = new THREE.TextureLoader().load(
+  "data:image/jpeg;base64,{encoded_image}"
+);
+
 const material = new THREE.MeshStandardMaterial({{
   map: texture,
   metalness: 0.2,
@@ -116,23 +121,25 @@ const material = new THREE.MeshStandardMaterial({{
 }});
 
 const heart = new THREE.Mesh(geometry, material);
-heart.scale.set(0.25,0.25,0.25);
+heart.scale.set(0.25, 0.25, 0.25);
 heart.rotation.x = Math.PI;
 scene.add(heart);
 
+// Animation
 function animate() {{
   requestAnimationFrame(animate);
   heart.rotation.y += 0.01;
-  heart.position.y = Math.sin(Date.now()*0.002)*0.15;
+  heart.position.y = Math.sin(Date.now() * 0.002) * 0.15;
   renderer.render(scene, camera);
 }}
 animate();
 
-window.addEventListener("resize", ()=>{
-  camera.aspect = window.innerWidth/window.innerHeight;
+// Resize
+window.addEventListener("resize", () => {{
+  camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
-});
+}});
 </script>
 </body>
 </html>
@@ -140,7 +147,7 @@ window.addEventListener("resize", ()=>{
 
 components.html(html_heart, height=650)
 
-# ---------------- GAME 1: LOVE METER ----------------
+# ---------------- GAME 1 ----------------
 st.markdown("---")
 st.markdown("<h2 style='text-align:center; color:#c94f7c;'>💗 Love Meter 💗</h2>", unsafe_allow_html=True)
 
@@ -149,7 +156,7 @@ if "love" not in st.session_state:
 
 messages = [
     "You make me smile without trying 🥰",
-    "You feel like a warm hug 💞",
+    "You feel like home 💞",
     "I trust you with my heart 💗",
     "You’re my person 🌷",
     "Okay wow I’m very in love 💘"
@@ -163,31 +170,12 @@ for col in cols:
             if st.session_state.love <= len(messages):
                 st.toast(messages[st.session_state.love - 1])
 
-st.markdown(f"<h3 style='text-align:center;'>Love Level: {st.session_state.love}/5 💕</h3>", unsafe_allow_html=True)
+st.markdown(
+    f"<h3 style='text-align:center;'>Love Level: {st.session_state.love}/5 💕</h3>",
+    unsafe_allow_html=True
+)
 
-# ---------------- GAME 2: MINI QUIZ ----------------
-st.markdown("---")
-st.markdown("<h2 style='text-align:center; color:#c94f7c;'>💌 How Well Do You Know Us?</h2>", unsafe_allow_html=True)
-
-questions = [
-    ("What do I choose every time?", ["You", "Sleep", "Food"], "You"),
-    ("What am I best at?", ["Overthinking", "Loving you", "Both"], "Both"),
-    ("Our vibe is:", ["Soft chaos", "Main character", "All of the above"], "All of the above")
-]
-
-score = 0
-for q, options, answer in questions:
-    choice = st.radio(q, options, key=q)
-    if choice == answer:
-        score += 1
-
-if st.button("✨ Submit ✨"):
-    if score == 3:
-        st.success("Perfect score 💗 You win unlimited love.")
-    else:
-        st.info("Still cute. Still mine. Still loved 💕")
-
-# ---------------- FINAL MESSAGE ----------------
+# ---------------- FINAL NOTE ----------------
 st.markdown("""
 <div style="
 margin:40px auto;
@@ -199,11 +187,8 @@ text-align:center;
 color:#5b2b3a;
 font-size:18px;
 ">
-No matter how many games you play,  
-you already won.  
-
-It’s you.  
-Always you 🤍
+You don’t need to win a game.  
+You already have my heart 🤍  
 </div>
 """, unsafe_allow_html=True)
 
