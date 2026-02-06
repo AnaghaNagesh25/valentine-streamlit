@@ -1,294 +1,195 @@
 import streamlit as st
 import base64
 import random
-from streamlit.components.v1 import html
 
-# ---------------- PAGE CONFIG ----------------
-st.set_page_config(
-    page_title="For You, My Babyboy 💖",
-    page_icon="💗",
-    layout="wide"
-)
+st.set_page_config(page_title="For You, My Babyboy 💗", layout="wide")
 
-st.markdown(
-    "<h1 style='text-align:center;'>for you, my babyboy 💕</h1>",
-    unsafe_allow_html=True
-)
+# ---------- LOAD IMAGE ----------
+def load_image_base64(path):
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
 
-# ---------------- LOAD IMAGE ----------------
-with open("buhb.jpeg", "rb") as img_file:
-    encoded_image = base64.b64encode(img_file.read()).decode()
+img_base64 = load_image_base64("buhb.jpeg")
 
-image_src = f"data:image/jpeg;base64,{encoded_image}"
+# ---------- STYLES ----------
+st.markdown("""
+<style>
+html, body {
+    background: linear-gradient(180deg, #ffd6e8, #ffeef6);
+    overflow-x: hidden;
+    font-family: 'Georgia', serif;
+}
 
-# ---------------- POEM ----------------
-poem = """
-We walked through storms that left no witnesses,  
-winds that tried to rewrite who we were.  
+.title {
+    text-align: center;
+    font-size: 3rem;
+    color: #7a1c4b;
+    margin-top: 20px;
+}
 
-We learned how to stay soft  
-in a world that asked us to harden.  
+.poem {
+    max-width: 800px;
+    margin: auto;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.65);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(255,105,180,0.25);
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #3a0f25;
+}
 
-Everything else bent.  
-Everything else broke.  
+.game-box {
+    background: rgba(255,255,255,0.75);
+    padding: 20px;
+    border-radius: 20px;
+    margin-top: 20px;
+    box-shadow: 0 15px 30px rgba(255,105,180,0.2);
+}
 
-But our love —  
-untouched, unpolluted —  
-stood exactly where the storm gave up.  
+</style>
+""", unsafe_allow_html=True)
 
-We didn’t rush the healing.  
-We let time teach us gentleness again.  
+# ---------- HEADER ----------
+st.markdown("<div class='title'>For You, My Babyboy 💗</div>", unsafe_allow_html=True)
 
-And now, in the quiet after the chaos,  
-I don’t want a beginning that forgets the past.  
-I want a forever that remembers  
-what it took to arrive here.  
-
-If the world falls apart again,  
-let it.  
-
-As long as it’s you and me,  
-I will choose this love —  
-again, again, and forever.
-"""
-
-with st.expander("🖤 A Poem For Us"):
-    st.markdown(
-        f"<p style='font-size:18px; line-height:1.7'>{poem}</p>",
-        unsafe_allow_html=True
-    )
-
-# ---------------- 3D SCENE ----------------
-html_scene = """
+# ---------- 3D HEART + SWANS ----------
+st.components.v1.html("""
 <!DOCTYPE html>
 <html>
 <head>
-<style>
-body {
-  margin: 0;
-  overflow: hidden;
-  background: linear-gradient(-45deg, #ffd6e8, #fbb1c8, #fde2e4, #f8cdda);
-  background-size: 400% 400%;
-  animation: bg 20s ease infinite;
-}
-
-@keyframes bg {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
-
-<body>
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<body style="margin:0; overflow:hidden;">
 
 <script>
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeight, 0.1, 100);
-camera.position.z = 14;
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+camera.position.z = 5;
 
-const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+const renderer = new THREE.WebGLRenderer({alpha:true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // Lights
-scene.add(new THREE.AmbientLight(0xffffff, 0.95));
-const pinkLight = new THREE.PointLight(0xff9ecb, 2);
-pinkLight.position.set(8,8,8);
-scene.add(pinkLight);
+const light = new THREE.PointLight(0xffffff, 1.2);
+light.position.set(5,5,5);
+scene.add(light);
 
-// ---------------- HEART ----------------
+// Heart Shape
 const heartShape = new THREE.Shape();
-heartShape.moveTo(0,2);
-heartShape.bezierCurveTo(0,2,-3,-1,-3,-3);
-heartShape.bezierCurveTo(-3,-6,0,-7,0,-4);
-heartShape.bezierCurveTo(0,-7,3,-6,3,-3);
-heartShape.bezierCurveTo(3,-1,0,2,0,2);
+heartShape.moveTo(0, 0);
+heartShape.bezierCurveTo(0, 0, -1.5, -1.5, -3, 0);
+heartShape.bezierCurveTo(-4.5, 2.5, -2, 5, 0, 6);
+heartShape.bezierCurveTo(2, 5, 4.5, 2.5, 3, 0);
+heartShape.bezierCurveTo(1.5, -1.5, 0, 0, 0, 0);
 
-const heartGeo = new THREE.ExtrudeGeometry(heartShape, {
-  depth: 1,
-  bevelEnabled: true,
-  bevelThickness: 0.6,
-  bevelSize: 0.45,
-  bevelSegments: 30
+const heartGeometry = new THREE.ExtrudeGeometry(heartShape, {
+    depth: 0.6,
+    bevelEnabled: true,
+    bevelThickness: 0.2,
+    bevelSize: 0.2,
+    bevelSegments: 10
 });
 
-const texture = new THREE.TextureLoader().load("__IMG__");
+const textureLoader = new THREE.TextureLoader();
+const photoTexture = textureLoader.load("data:image/jpeg;base64,{{IMG}}");
 
-const heartMat = new THREE.MeshPhongMaterial({
-  map: texture,
-  emissive: 0xff7aa2,
-  emissiveIntensity: 0.45,
-  shininess: 120
+const heartMaterial = new THREE.MeshStandardMaterial({
+    map: photoTexture,
+    metalness: 0.3,
+    roughness: 0.4
 });
 
-const heart = new THREE.Mesh(heartGeo, heartMat);
-heart.scale.set(0.22,0.22,0.22);
-heart.rotation.x = Math.PI;
+const heart = new THREE.Mesh(heartGeometry, heartMaterial);
+heart.scale.set(0.4,0.4,0.4);
 scene.add(heart);
 
-// ---------------- FLOATING PHOTO ----------------
-const planeGeo = new THREE.PlaneGeometry(2.2,2.8);
-const planeMat = new THREE.MeshBasicMaterial({
-  map: texture,
-  transparent: true,
-  opacity: 0.9
-});
-const memory = new THREE.Mesh(planeGeo, planeMat);
-memory.position.set(4,0,-1);
-scene.add(memory);
+// Swan shapes (abstract elegant curves)
+function createSwan(xStart) {
+    const curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(xStart, 0, 0),
+        new THREE.Vector3(xStart/2, 0.8, 0),
+        new THREE.Vector3(0, 0.3, 0)
+    ]);
 
-// ---------------- SWANS ----------------
-function makeSwan() {
-  const swan = new THREE.Group();
-
-  const body = new THREE.Mesh(
-    new THREE.SphereGeometry(0.85, 32, 32),
-    new THREE.MeshStandardMaterial({ color: 0xffffff })
-  );
-  body.scale.set(1.5,1,0.9);
-  swan.add(body);
-
-  const neck = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.1,0.2,2.2,32),
-    new THREE.MeshStandardMaterial({ color: 0xffffff })
-  );
-  neck.position.y = 1.2;
-  neck.rotation.z = Math.PI/7;
-  swan.add(neck);
-
-  const head = new THREE.Mesh(
-    new THREE.SphereGeometry(0.2, 32, 32),
-    new THREE.MeshStandardMaterial({ color: 0xffffff })
-  );
-  head.position.set(0.4,2.4,0);
-  swan.add(head);
-
-  return swan;
+    const tube = new THREE.TubeGeometry(curve, 50, 0.05, 8, false);
+    const mat = new THREE.MeshStandardMaterial({color: 0xffffff});
+    const swan = new THREE.Mesh(tube, mat);
+    scene.add(swan);
+    return swan;
 }
 
-const swanL = makeSwan();
-swanL.position.set(-10,-2,-3);
-scene.add(swanL);
+const swanLeft = createSwan(-4);
+const swanRight = createSwan(4);
 
-const swanR = makeSwan();
-swanR.position.set(10,-2,-3);
-swanR.rotation.y = Math.PI;
-scene.add(swanR);
+function animate() {
+    requestAnimationFrame(animate);
 
-// ---------------- SNOOPY SILHOUETTES ----------------
-function snoopyLine(x,y,scale){
-  const curve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(x,y,0),
-    new THREE.Vector3(x-0.6*scale,y+1.2*scale,0),
-    new THREE.Vector3(x+0.1*scale,y+1.8*scale,0),
-    new THREE.Vector3(x+1.2*scale,y+1.2*scale,0),
-    new THREE.Vector3(x+0.2*scale,y+0.4*scale,0)
-  ]);
-  const pts = curve.getPoints(40);
-  const geo = new THREE.BufferGeometry().setFromPoints(pts);
-  const mat = new THREE.LineBasicMaterial({ color: 0xffffff });
-  return new THREE.Line(geo, mat);
-}
+    heart.rotation.y += 0.01;
+    heart.rotation.x += 0.005;
 
-const snoopy1 = snoopyLine(-6,3,1);
-const snoopy2 = snoopyLine(6,-1,1.2);
-scene.add(snoopy1, snoopy2);
+    swanLeft.position.x += 0.01;
+    swanRight.position.x -= 0.01;
 
-// ---------------- BOWS ----------------
-function bow(x,y,z){
-  const geo = new THREE.TorusGeometry(0.18,0.06,16,100);
-  const mat = new THREE.MeshStandardMaterial({ color: 0xffb6d5 });
-  const b = new THREE.Mesh(geo,mat);
-  b.position.set(x,y,z);
-  return b;
-}
-
-const bows = [
-  bow(-3,3,-2),
-  bow(2,-2,-2),
-  bow(4,2,-2)
-];
-bows.forEach(b=>scene.add(b));
-
-// ---------------- SPARKLES ----------------
-const sparkles = [];
-const sparkleMat = new THREE.MeshBasicMaterial({ color: 0xffe0f0 });
-
-for(let i=0;i<40;i++){
-  const s = new THREE.Mesh(new THREE.SphereGeometry(0.04,8,8),sparkleMat);
-  s.position.set(
-    (Math.random()-0.5)*14,
-    (Math.random()-0.5)*10,
-    -4
-  );
-  scene.add(s);
-  sparkles.push(s);
-}
-
-// ---------------- ANIMATE ----------------
-let t=0;
-function animate(){
-  requestAnimationFrame(animate);
-  t+=0.008;
-
-  heart.rotation.y+=0.01;
-  memory.rotation.y-=0.005;
-
-  swanL.position.x=-10+Math.sin(t)*5;
-  swanR.position.x=10-Math.sin(t)*5;
-
-  bows.forEach(b=>b.rotation.z+=0.02);
-
-  sparkles.forEach(s=>{
-    s.position.y+=0.01;
-    if(s.position.y>5) s.position.y=-5;
-  });
-
-  renderer.render(scene,camera);
+    renderer.render(scene, camera);
 }
 animate();
-
-window.addEventListener('resize',()=>{
-  camera.aspect=window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth,window.innerHeight);
-});
 </script>
+
 </body>
 </html>
-"""
+""".replace("{{IMG}}", img_base64), height=600)
 
-html(html_scene.replace("__IMG__", image_src), height=650)
+# ---------- POEM ----------
+st.markdown("""
+<div class="poem">
+We walked through storms that never asked permission.<br>
+The kind that carved silence into our bones,<br>
+the kind that taught us how to survive before we learned how to hope.<br><br>
 
-# ---------------- GAMES ----------------
-st.markdown("## 💘 Valentine Games")
+There were nights love felt heavy,<br>
+days it felt fragile,<br>
+moments where staying was the bravest thing we could do.<br><br>
 
-col1, col2, col3 = st.columns(3)
+Everything else bent.<br>
+Everything else broke.<br>
+But not us.<br><br>
 
-with col1:
-    if st.button("💌 Love Message", key="msg"):
+Because what we built was never loud.<br>
+It was steady.<br>
+Chosen.<br>
+Earned.<br><br>
+
+Now, standing where the storm can’t reach,<br>
+I don’t want a love that forgets the past.<br>
+I want one that survived it.<br><br>
+
+If the world asks us to begin again,<br>
+I will — every time —<br>
+as long as it’s with you.
+</div>
+""", unsafe_allow_html=True)
+
+# ---------- GAMES ----------
+st.markdown("### 💘 Valentine Games")
+
+with st.container():
+    st.markdown("<div class='game-box'>", unsafe_allow_html=True)
+    if st.button("💖 Tap for Love"):
         st.success(random.choice([
-            "Still you. Always you.",
             "You are my safest place.",
-            "My calm after every storm.",
-            "I choose you — every lifetime."
+            "I choose you, always.",
+            "Still you. Still us.",
+            "Forever starts here."
         ]))
+    st.markdown("</div>", unsafe_allow_html=True)
 
-with col2:
-    if st.button("🎲 Fate Dice", key="dice"):
-        st.info(random.choice([
-            "Cuddle night 💕",
-            "Movie + snacks 🍿",
-            "Long hug, no words 🤍",
-            "Soft love, no rush 🖤"
-        ]))
-
-with col3:
-    if st.button("💖 Forever Button", key="forever"):
-        st.balloons()
-        st.markdown("### It’s always you. 🌙")
-
+with st.container():
+    st.markdown("<div class='game-box'>", unsafe_allow_html=True)
+    answer = st.radio("What survives everything?", ["Time", "Fear", "Love"])
+    if answer == "Love":
+        st.success("Correct. It was always us 💗")
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
