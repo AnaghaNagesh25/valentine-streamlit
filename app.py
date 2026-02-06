@@ -192,109 +192,119 @@ again, again, and forever.
 """, unsafe_allow_html=True)
 
 
-if st.session_state.puzzle == list(range(9)):
+import streamlit.components.v1 as components
 
-st.markdown("## 💞 Run Toward Each Other")
-
-st.components.v1.html("""
+components.html("""
 <!DOCTYPE html>
 <html>
 <head>
 <style>
 canvas {
-  background: linear-gradient(#ffd6eb, #ffb3d1);
+  background: linear-gradient(#ffd1ea, #ff9fcf);
   border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(255,105,180,0.4);
+  box-shadow: 0 15px 30px rgba(255,105,180,0.4);
 }
 button {
-  background:#ff8fcf;
+  background:#ff6fae;
   border:none;
-  padding:10px 18px;
-  border-radius:18px;
-  color:#4b0f2b;
-  font-weight:600;
+  padding:12px 20px;
+  border-radius:20px;
+  color:white;
+  font-size:16px;
   cursor:pointer;
 }
 </style>
 </head>
 <body>
 
-<canvas id="game" width="700" height="260"></canvas>
+<h2 style="color:#5b0036;text-align:center;">
+Run Toward Forever 💗
+</h2>
+
+<canvas id="game" width="600" height="200"></canvas>
 <br><br>
 <div style="text-align:center;">
-<button onclick="jumpGirl()">Girl Jump 💗</button>
-<button onclick="jumpBoy()">Boy Jump 💙</button>
+<button onclick="jump()">JUMP 💕</button>
 </div>
 
 <script>
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-const girlImg = new Image();
-girlImg.src = "buhb.jpeg";
+let y = 140;
+let vy = 0;
+let gravity = 1.2;
+let grounded = true;
+let heartX = 550;
+let gameWon = false;
 
-const boyImg = new Image();
-boyImg.src = "buhb.jpeg";
+const playerImg = new Image();
+playerImg.src = "buhb.jpeg";
 
 const heartImg = new Image();
-heartImg.src = "https://i.imgur.com/Qp5ZQ9M.png";
+heartImg.src = "https://i.imgur.com/Qp5ZQ9M.png"; // glossy heart
 
-let girl = {x:60,y:170,vy:0};
-let boy  = {x:140,y:170,vy:0};
-let gravity = 1.2;
+function jump(){
+  if(grounded){
+    vy = -15;
+    grounded = false;
+  }
+}
 
-let obstacles = [{x:500},{x:650}];
-let heartX = 850;
-let win = false;
-
-function jumpGirl(){ if(girl.y>=170) girl.vy=-15; }
-function jumpBoy(){ if(boy.y>=170) boy.vy=-15; }
-
-function drawChar(img,x,y){
+function drawHeart(){
   ctx.save();
-  ctx.beginPath();
-  ctx.arc(x+20,y+20,20,0,Math.PI*2);
-  ctx.clip();
-  ctx.drawImage(img,x,y,40,40);
+  ctx.translate(heartX, 120);
+  ctx.scale(1.6,1.6);
+  ctx.shadowColor = "#ff4fa3";
+  ctx.shadowBlur = 20;
+  ctx.drawImage(heartImg, -30, -30, 60, 60);
   ctx.restore();
 }
 
 function update(){
-  ctx.clearRect(0,0,700,260);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // Player physics
+  y += vy;
+  vy += gravity;
+  if(y >= 140){
+    y = 140;
+    vy = 0;
+    grounded = true;
+  }
 
   // Ground
-  ctx.fillStyle="#ff8fcf";
-  ctx.fillRect(0,210,700,50);
+  ctx.fillStyle = "#ff8fcf";
+  ctx.fillRect(0,170,600,30);
 
-  // Physics
-  girl.y+=girl.vy; girl.vy+=gravity;
-  boy.y+=boy.vy; boy.vy+=gravity;
-  if(girl.y>=170){girl.y=170;girl.vy=0;}
-  if(boy.y>=170){boy.y=170;boy.vy=0;}
+  // Player
+  ctx.drawImage(playerImg, 50, y, 40, 40);
 
-  // Move world
-  obstacles.forEach(o=>o.x-=2);
-  heartX-=2;
+  // Heart movement
+  if(!gameWon){
+    heartX -= 2;
+  }
 
-  // Draw obstacles
-  ctx.fillStyle="#ff4fa3";
-  obstacles.forEach(o=>ctx.fillRect(o.x,180,20,30));
+  drawHeart();
 
-  // Draw characters
-  drawChar(girlImg,girl.x,girl.y);
-  drawChar(boyImg,boy.x,boy.y);
+  // Win condition
+  if(heartX < 90){
+    gameWon = true;
+    ctx.fillStyle = "#5b0036";
+    ctx.font = "20px serif";
+    ctx.fillText("You made it to forever 💗", 180, 90);
+  }
 
-  // Draw heart
-  ctx.save();
-  ctx.shadowColor="#ff4fa3";
-  ctx.shadowBlur=20;
-  ctx.drawImage(heartImg,heartX,150,60,60);
-  ctx.restore();
+  requestAnimationFrame(update);
+}
 
-  // Win
-  if(heartX<200 && !win){
-    win=true;
-    ctx
+update();
+</script>
+
+</body>
+</html>
+""", height=360)
+
 
 
 # ---------------- FUN GAMES ----------------
