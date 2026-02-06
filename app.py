@@ -1,92 +1,60 @@
-import streamlit as st
-import streamlit.components.v1 as components
-import base64
-
-st.set_page_config(page_title="For You 💕", layout="wide")
+st.markdown("---")
 
 st.markdown(
-    "<h1 style='text-align:center; color:#c94f7c;'>I made this for you 💗</h1>",
+    "<h2 style='text-align:center; color:#c94f7c;'>💘 Catch My Heart 💘</h2>",
     unsafe_allow_html=True
 )
 
 st.markdown(
-    "<p style='text-align:center;'>A tiny 3D world, just us ✨</p>",
+    "<p style='text-align:center;'>Click the hearts to collect love points ✨</p>",
     unsafe_allow_html=True
 )
 
-# Load image
-with open("buhb.jpeg", "rb") as f:
-    encoded = base64.b64encode(f.read()).decode()
+# Initialize score
+if "love_score" not in st.session_state:
+    st.session_state.love_score = 0
 
-html_3d = f"""
-<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    body {{
-      margin: 0;
-      overflow: hidden;
-      background: linear-gradient(#fde2e4, #fadadd);
-    }}
-  </style>
-</head>
-<body>
+messages = [
+    "You make my days softer 💕",
+    "I smile every time I think of you 🌷",
+    "You feel like home 🏡",
+    "I’d choose you every lifetime ♾️",
+    "You already won my heart 💗"
+]
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+cols = st.columns(5)
 
-<script>
-  const scene = new THREE.Scene();
+for i, col in enumerate(cols):
+    with col:
+        if st.button("💗"):
+            st.session_state.love_score += 1
+            if st.session_state.love_score <= len(messages):
+                st.toast(messages[st.session_state.love_score - 1])
 
-  const camera = new THREE.PerspectiveCamera(
-    50,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    100
-  );
+st.markdown(
+    f"<h3 style='text-align:center;'>Love Score: {st.session_state.love_score} 💞</h3>",
+    unsafe_allow_html=True
+)
 
-  const renderer = new THREE.WebGLRenderer({{ antialias: true, alpha: true }});
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
+# Win condition
+if st.session_state.love_score >= 5:
+    st.markdown(
+        """
+        <div style="
+            background: rgba(255, 214, 232, 0.6);
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            margin-top: 20px;
+        ">
+        <h2>🦄 You unlocked the secret 💖</h2>
+        <p>
+        If love were a game,<br>
+        you’d already be winning.<br><br>
+        Happy Valentine’s, my favorite person 💕
+        </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-  scene.add(new THREE.AmbientLight(0xffffff, 1));
-  const light = new THREE.PointLight(0xffffff, 0.8);
-  light.position.set(5,5,5);
-  scene.add(light);
-
-  const loader = new THREE.TextureLoader();
-  loader.load("data:image/jpeg;base64,{encoded}", texture => {{
-    const geometry = new THREE.PlaneGeometry(4, 5.5);
-    const material = new THREE.MeshBasicMaterial({{
-      map: texture,
-      transparent: true
-    }});
-
-    const couple = new THREE.Mesh(geometry, material);
-    scene.add(couple);
-
-    function animate() {{
-      requestAnimationFrame(animate);
-      const t = Date.now() * 0.001;
-      couple.position.y = Math.sin(t) * 0.15;
-      couple.rotation.y = Math.sin(t * 0.5) * 0.15;
-      camera.position.x = Math.sin(t * 0.3) * 0.4;
-      camera.lookAt(0, 0, 0);
-      renderer.render(scene, camera);
-    }}
-    animate();
-  }});
-
-  camera.position.z = 7;
-
-  window.addEventListener("resize", () => {{
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  }});
-</script>
-
-</body>
-</html>
-"""
-
-components.html(html_3d, height=600)
