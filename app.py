@@ -237,34 +237,24 @@ if st.session_state.puzzle == list(range(9)):
 st.markdown("### 💘 Valentine Games")
 
 # Fate Dice
-with st.container():
-    st.markdown("<div class='game'>", unsafe_allow_html=True)
-    if st.button("🎲 Roll the Fate Dice", key="dice"):
-        st.success(random.choice([
-            "We were always meant to find each other.",
-            "Every road led back to us.",
-            "Even fate knew we’d choose love.",
-            "This connection was written long before us."
-        ]))
-    st.markdown("</div>", unsafe_allow_html=True)
+if st.button("🎲 Roll the Fate Dice", key="dice"):
+    pink_result(random.choice([
+        "We were always meant to find each other.",
+        "Every road led back to us.",
+        "Even fate knew we’d choose love.",
+        "This connection was written long before us."
+    ]))
 
-# Love Message Generator
-with st.container():
-    st.markdown("<div class='game'>", unsafe_allow_html=True)
-    if st.button("💌 Generate a Love Message", key="love_msg"):
-        st.success(random.choice([
-            "You are my calm after every storm.",
-            "Still you. Still us.",
-            "I feel safest when I’m choosing you.",
-            "Every version of forever looks like you."
-        ]))
-    st.markdown("</div>", unsafe_allow_html=True)
+# Love Message
+if st.button("💌 Generate a Love Message", key="love_msg"):
+    pink_result(random.choice([
+        "You are my calm after every storm.",
+        "Still you. Still us.",
+        "I feel safest when I’m choosing you.",
+        "Every version of forever looks like you."
+    ]))
 
-# Forever Button + Balloons
-with st.container():
-    st.markdown("<div class='game'>", unsafe_allow_html=True)
-    if st.button("💍 FOREVER", key="forever"):
-        st.balloons()
-        st.success("Locked in. No matter what. Forever 💗")
-    st.markdown("</div>", unsafe_allow_html=True)
-
+# Forever
+if st.button("💍 FOREVER", key="forever"):
+    st.balloons()
+    pink_result("Locked in. No matter what. Forever 💗")
