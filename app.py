@@ -191,50 +191,84 @@ again, again, and forever.
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("### 🧩 Tiny Love Puzzle")
+import streamlit as st
+import random
 
-# --- INIT ---
-img = Image.open("buhb.jpeg").resize((120,120))
-tiles = np.array(img).reshape(3,40,3,40,3).swapaxes(1,2).reshape(-1,40,40,3)
+st.set_page_config(page_title="Tiny Love Car Game", layout="centered")
 
-if "puzzle" not in st.session_state:
-    st.session_state.puzzle = list(range(9))
-    random.shuffle(st.session_state.puzzle)
+# ---------- STYLES ----------
+st.markdown("""
+<style>
+body { background:#ffe6f2; }
+.game-wrap { width:260px; margin:auto; }
+.grid { display:grid; grid-template-columns:repeat(5, 44px); grid-gap:6px; }
+.tile {
+  width:44px; height:44px; border-radius:10px;
+  background:linear-gradient(145deg,#ff9acb,#ff6fb3);
+  box-shadow:6px 6px 12px rgba(0,0,0,.18), -4px -4px 10px rgba(255,255,255,.6);
+  display:flex; align-items:center; justify-content:center; font-size:20px;
+}
+.road { background:linear-gradient(145deg,#ffd1e8,#ffb6da); }
+.heart { background:linear-gradient(145deg,#ff4f9a,#ff86bf); color:white; }
+.msg { background:#ffd1e8; padding:10px; border-radius:14px; text-align:center; color:#7a1c4b; font-weight:600; margin-top:8px; }
+.controls { display:flex; gap:6px; justify-content:center; margin-top:8px; }
+</style>
+""", unsafe_allow_html=True)
 
-def is_adjacent(i, j):
-    r1, c1 = divmod(i, 3)
-    r2, c2 = divmod(j, 3)
-    return abs(r1 - r2) + abs(c1 - c2) == 1
+# ---------- STATE ----------
+if "p1" not in st.session_state:
+    st.session_state.p1 = [0, 2]
+    st.session_state.p2 = [4, 2]
+    st.session_state.heart = [2, 2]
 
-def move_tile(tile_index):
-    empty = st.session_state.puzzle.index(8)
-    if is_adjacent(tile_index, empty):
-        st.session_state.puzzle[empty], st.session_state.puzzle[tile_index] = \
-            st.session_state.puzzle[tile_index], st.session_state.puzzle[empty]
+# ---------- HELPERS ----------
+def move(player, dx, dy):
+    p = st.session_state.p1 if player == 1 else st.session_state.p2
+    nx, ny = p[0] + dx, p[1] + dy
+    if 0 <= nx < 5 and 0 <= ny < 5:
+        p[0], p[1] = nx, ny
 
-# --- GRID ---
-cols = st.columns(3, gap="small")
-for i, tile in enumerate(st.session_state.puzzle):
-    with cols[i % 3]:
-        if tile != 8:
-            st.image(tiles[tile], width=40)
-            st.caption(f"{tile+1}")
-            st.button("⬜", key=f"tile{i}", on_click=move_tile, args=(i,))
-        else:
-            st.write(" ")
+# ---------- UI ----------
+st.markdown("<div class='game-wrap'>", unsafe_allow_html=True)
+st.markdown("### 🚗💗 Tiny Love Car Game")
 
-# --- CONTROLS ---
-c1, c2 = st.columns(2)
-if c1.button("🔀 Shuffle Puzzle", key="shuffle"):
-    random.shuffle(st.session_state.puzzle)
+# GRID
+st.markdown("<div class='grid'>", unsafe_allow_html=True)
+for y in range(5):
+    for x in range(5):
+        icon = ""
+        cls = "tile road"
+        if [x, y] == st.session_state.heart:
+            icon = "💗"
+            cls = "tile heart"
+        if [x, y] == st.session_state.p1:
+            icon = "🚗"
+        if [x, y] == st.session_state.p2:
+            icon = "🚙"
+        st.markdown(f"<div class='{cls}'>{icon}</div>", unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
 
-if st.session_state.puzzle == list(range(9)):
-    st.markdown("""
-    <div style="background:#ffd1e8;padding:12px;border-radius:12px;
-    text-align:center;color:#7a1c4b;font-weight:600;">
-    You put us back together 💗
-    </div>
-    """, unsafe_allow_html=True)
+# CONTROLS
+st.markdown("<div class='controls'>", unsafe_allow_html=True)
+col1, col2 = st.columns(2)
+with col1:
+    st.button("⬆️", on_click=move, args=(1, 0, -1))
+    st.button("⬅️", on_click=move, args=(1, -1, 0))
+    st.button("➡️", on_click=move, args=(1, 1, 0))
+    st.button("⬇️", on_click=move, args=(1, 0, 1))
+with col2:
+    st.button("⬆️ ", on_click=move, args=(2, 0, -1))
+    st.button("⬅️ ", on_click=move, args=(2, -1, 0))
+    st.button("➡️ ", on_click=move, args=(2, 1, 0))
+    st.button("⬇️ ", on_click=move, args=(2, 0, 1))
+st.markdown("</div>", unsafe_allow_html=True)
+
+# WIN
+if st.session_state.p1 == st.session_state.heart and st.session_state.p2 == st.session_state.heart:
+    st.markdown("<div class='msg'>Two paths. One heart. 💞</div>", unsafe_allow_html=True)
+
+st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 # ---------------- FUN GAMES ----------------
