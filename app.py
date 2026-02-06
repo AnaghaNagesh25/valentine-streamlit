@@ -504,8 +504,5 @@ with st.container():
     if st.button("💍 FOREVER", key="forever"):
         st.balloons()
         st.success("Locked in. No matter what. Forever 💗")
-    st.markdown("</div>", unsafe_allow_html=True) change the output of fun games all 3 to pink color instead of green n make it dino game with the 2 characters in picture reaching a heart and obstacles between separate the girl and boy from picture make it like guy and girl are trying toi reac h eo the game separate both from image make them individuals trying to reCh each other to the heart
-
-
-
+    st.markdown("</div>", unsafe_allow_html=True) 
 
