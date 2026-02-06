@@ -191,48 +191,51 @@ again, again, and forever.
 </div>
 """, unsafe_allow_html=True)
 
+st.markdown("### 🧩 Tiny Love Puzzle")
 
-# ---------------- SMALL SLIDING PUZZLE ----------------
-st.markdown("### 🧩 Put Us Back Together")
-
-img = Image.open("buhb.jpeg").resize((240,240))
-tiles = np.array(img).reshape(3,80,3,80,3).swapaxes(1,2).reshape(-1,80,80,3)
+# --- INIT ---
+img = Image.open("buhb.jpeg").resize((120,120))
+tiles = np.array(img).reshape(3,40,3,40,3).swapaxes(1,2).reshape(-1,40,40,3)
 
 if "puzzle" not in st.session_state:
     st.session_state.puzzle = list(range(9))
     random.shuffle(st.session_state.puzzle)
 
-def move(direction):
-    idx = st.session_state.puzzle.index(8)
-    r, c = divmod(idx, 3)
-    swaps = {
-        "⬅️": (r, c+1),
-        "➡️": (r, c-1),
-        "⬆️": (r+1, c),
-        "⬇️": (r-1, c)
-    }
-    if direction in swaps:
-        nr, nc = swaps[direction]
-        if 0 <= nr < 3 and 0 <= nc < 3:
-            ni = nr*3 + nc
-            st.session_state.puzzle[idx], st.session_state.puzzle[ni] = st.session_state.puzzle[ni], st.session_state.puzzle[idx]
+def is_adjacent(i, j):
+    r1, c1 = divmod(i, 3)
+    r2, c2 = divmod(j, 3)
+    return abs(r1 - r2) + abs(c1 - c2) == 1
 
-cols = st.columns(3)
+def move_tile(tile_index):
+    empty = st.session_state.puzzle.index(8)
+    if is_adjacent(tile_index, empty):
+        st.session_state.puzzle[empty], st.session_state.puzzle[tile_index] = \
+            st.session_state.puzzle[tile_index], st.session_state.puzzle[empty]
+
+# --- GRID ---
+cols = st.columns(3, gap="small")
 for i, tile in enumerate(st.session_state.puzzle):
-    with cols[i%3]:
+    with cols[i % 3]:
         if tile != 8:
-            st.image(tiles[tile], use_container_width=True)
+            st.image(tiles[tile], width=40)
+            st.caption(f"{tile+1}")
+            st.button("⬜", key=f"tile{i}", on_click=move_tile, args=(i,))
         else:
             st.write(" ")
 
-ctrl = st.columns(4)
-if ctrl[0].button("⬅️"): move("⬅️")
-if ctrl[1].button("⬆️"): move("⬆️")
-if ctrl[2].button("⬇️"): move("⬇️")
-if ctrl[3].button("➡️"): move("➡️")
+# --- CONTROLS ---
+c1, c2 = st.columns(2)
+if c1.button("🔀 Shuffle Puzzle", key="shuffle"):
+    random.shuffle(st.session_state.puzzle)
 
 if st.session_state.puzzle == list(range(9)):
-    st.success("You fixed us — perfectly 💗")
+    st.markdown("""
+    <div style="background:#ffd1e8;padding:12px;border-radius:12px;
+    text-align:center;color:#7a1c4b;font-weight:600;">
+    You put us back together 💗
+    </div>
+    """, unsafe_allow_html=True)
+
 
 # ---------------- FUN GAMES ----------------
 st.markdown("### 💘 Valentine Games")
