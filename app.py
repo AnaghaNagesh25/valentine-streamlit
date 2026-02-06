@@ -67,6 +67,21 @@ button {
 """, unsafe_allow_html=True)
 
 st.markdown("<div class='title'>For You, My Babyboy 💗</div>", unsafe_allow_html=True)
+def pink_result(text):
+    st.markdown(f"""
+    <div style="
+        background:#ffd6eb;
+        color:#5b0036;
+        padding:14px;
+        border-radius:14px;
+        margin-top:10px;
+        box-shadow:0 10px 25px rgba(255,105,180,0.3);
+        font-weight:600;
+        text-align:center;">
+        {text}
+    </div>
+    """, unsafe_allow_html=True)
+
 
 # ---------------- 3D HEART + SWANS ----------------
 st.components.v1.html("""
