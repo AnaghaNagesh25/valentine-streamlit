@@ -266,21 +266,47 @@ if (
     st.session_state.won = True
 
 if st.session_state.won:
-    st.markdown("""
-    <div style="
-        margin-top:20px;
-        padding:18px;
-        background:linear-gradient(135deg,#ff8fcf,#ffc1e3);
-        border-radius:20px;
-        text-align:center;
-        font-size:18px;
-        box-shadow:0 10px 25px rgba(255,105,180,0.4);
-        color:#5b0036;">
-        💗 You always find each other.<br>
-        No matter the path. No matter the storm. 💗
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("""# ---------------- SMALL SLIDING PUZZLE ----------------
+st.markdown("### 🧩 Put Us Back Together")
 
+img = Image.open("buhb.jpeg").resize((240,240))
+tiles = np.array(img).reshape(3,80,3,80,3).swapaxes(1,2).reshape(-1,80,80,3)
+
+if "puzzle" not in st.session_state:
+    st.session_state.puzzle = list(range(9))
+    random.shuffle(st.session_state.puzzle)
+
+def move(direction):
+    idx = st.session_state.puzzle.index(8)
+    r, c = divmod(idx, 3)
+    swaps = {
+        "⬅️": (r, c+1),
+        "➡️": (r, c-1),
+        "⬆️": (r+1, c),
+        "⬇️": (r-1, c)
+    }
+    if direction in swaps:
+        nr, nc = swaps[direction]
+        if 0 <= nr < 3 and 0 <= nc < 3:
+            ni = nr*3 + nc
+            st.session_state.puzzle[idx], st.session_state.puzzle[ni] = st.session_state.puzzle[ni], st.session_state.puzzle[idx]
+
+cols = st.columns(3)
+for i, tile in enumerate(st.session_state.puzzle):
+    with cols[i%3]:
+        if tile != 8:
+            st.image(tiles[tile], use_container_width=True)
+        else:
+            st.write(" ")
+
+ctrl = st.columns(4)
+if ctrl[0].button("⬅️"): move("⬅️")
+if ctrl[1].button("⬆️"): move("⬆️")
+if ctrl[2].button("⬇️"): move("⬇️")
+if ctrl[3].button("➡️"): move("➡️")
+
+if st.session_state.puzzle == list(range(9)):
+    st.success("You fixed us — perfectly 💗")
 
 # ---------------- FUN GAMES ----------------
 st.markdown("### 💘 Valentine Games")
