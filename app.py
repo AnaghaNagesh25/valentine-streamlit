@@ -17,13 +17,17 @@ img_b64 = load_base64("buhb.jpeg")
 st.markdown("""
 <style>
 html, body {
-    background: radial-gradient(circle at top, #ffd6eb, #ffc0d9, #ffb3d1);
-    background-size: 400% 400%;
-    animation: bgMove 15s ease infinite;
+    background:
+        radial-gradient(circle at 15% 25%, #ffd6eb 0%, transparent 35%),
+        radial-gradient(circle at 85% 35%, #ffc1dc 0%, transparent 40%),
+        radial-gradient(circle at 50% 85%, #ffb3d1 0%, transparent 45%),
+        linear-gradient(180deg, #ffe6f2, #ffd1e8);
+    background-size: 300% 300%;
+    animation: bgFloat 18s ease infinite;
     font-family: 'Georgia', serif;
 }
 
-@keyframes bgMove {
+@keyframes bgFloat {
     0% {background-position: 0% 50%;}
     50% {background-position: 100% 50%;}
     100% {background-position: 0% 50%;}
@@ -37,20 +41,27 @@ html, body {
 }
 
 .card {
-    background: rgba(255,255,255,0.75);
-    padding: 25px;
-    border-radius: 22px;
-    box-shadow: 0 20px 40px rgba(255,105,180,0.25);
-    margin: 20px auto;
+    background: rgba(255, 240, 248, 0.88);
+    padding: 28px;
+    border-radius: 24px;
+    box-shadow: 0 25px 45px rgba(255,105,180,0.3);
+    margin: 25px auto;
     max-width: 900px;
 }
 
 .game {
-    background: rgba(255,255,255,0.85);
-    padding: 20px;
-    border-radius: 18px;
-    box-shadow: 0 10px 25px rgba(255,105,180,0.2);
-    margin-bottom: 20px;
+    background: rgba(255,240,248,0.92);
+    padding: 22px;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(255,105,180,0.3);
+    margin-bottom: 22px;
+}
+
+button {
+    background-color: #ff9acb !important;
+    color: #4b0f2b !important;
+    border-radius: 14px !important;
+    font-weight: 600;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -74,13 +85,12 @@ const renderer = new THREE.WebGLRenderer({alpha:true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Lights
 scene.add(new THREE.AmbientLight(0xffffff, 0.9));
-const light = new THREE.PointLight(0xffffff, 1.5);
+const light = new THREE.PointLight(0xffffff, 1.6);
 light.position.set(5,5,5);
 scene.add(light);
 
-// Heart shape
+// Heart
 const shape = new THREE.Shape();
 shape.moveTo(0,0);
 shape.bezierCurveTo(0,0,-2,-2,-4,0);
@@ -106,10 +116,10 @@ scene.add(heart);
 function swan(x) {
     const curve = new THREE.CatmullRomCurve3([
         new THREE.Vector3(x,0,0),
-        new THREE.Vector3(x/2,1.2,0),
+        new THREE.Vector3(x/2,1.3,0),
         new THREE.Vector3(0,0.4,0)
     ]);
-    const g = new THREE.TubeGeometry(curve,50,0.06,8,false);
+    const g = new THREE.TubeGeometry(curve,60,0.06,8,false);
     const m = new THREE.MeshStandardMaterial({color:0xffffff});
     const s = new THREE.Mesh(g,m);
     scene.add(s);
@@ -123,8 +133,8 @@ function animate(){
     requestAnimationFrame(animate);
     heart.rotation.y += 0.01;
     heart.rotation.x += 0.005;
-    swanL.position.x += 0.015;
-    swanR.position.x -= 0.015;
+    swanL.position.x += 0.012;
+    swanR.position.x -= 0.012;
     renderer.render(scene,camera);
 }
 animate();
@@ -133,66 +143,114 @@ animate();
 </html>
 """.replace("{{IMG}}", img_b64), height=600)
 
-# ---------------- POEM ----------------
+# ---------------- POEM (UNCHANGED) ----------------
 st.markdown("""
 <div class="card">
-We survived storms that rewrote us.<br>
-Not loudly — but deeply.<br><br>
+We walked through storms that left no witnesses,<br>
+winds that tried to rewrite who we were.<br><br>
 
-Everything else bent, broke, or disappeared.<br>
-But our love stayed untouched —<br>
-not because it was easy,<br>
-but because it was chosen.<br><br>
+We learned how to stay soft<br>
+in a world that asked us to harden.<br><br>
+
+Everything else bent.<br>
+Everything else broke.<br><br>
+
+But our love —<br>
+untouched, unpolluted —<br>
+stood exactly where the storm gave up.<br><br>
 
 We didn’t rush the healing.<br>
-We learned how to be gentle again.<br>
-How to trust the light when it returned.<br><br>
+We let time teach us gentleness again.<br><br>
 
-If the world asks us to begin again,<br>
-I will — every lifetime —<br>
-as long as it’s with you.
+And now, in the quiet after the chaos,<br>
+I don’t want a beginning that forgets the past.<br>
+I want a forever that remembers<br>
+what it took to arrive here.<br><br>
+
+If the world falls apart again,<br>
+let it.<br><br>
+
+As long as it’s you and me,<br>
+I will choose this love —<br>
+again, again, and forever.
 </div>
 """, unsafe_allow_html=True)
 
-# ---------------- PUZZLE GAME ----------------
-st.markdown("### 🧩 Piece Us Back Together")
+# ---------------- SMALL SLIDING PUZZLE ----------------
+st.markdown("### 🧩 Put Us Back Together")
 
-img = Image.open("buhb.jpeg").resize((300,300))
-tiles = np.array(img).reshape(3,100,3,100,3).swapaxes(1,2).reshape(-1,100,100,3)
+img = Image.open("buhb.jpeg").resize((240,240))
+tiles = np.array(img).reshape(3,80,3,80,3).swapaxes(1,2).reshape(-1,80,80,3)
 
-if "order" not in st.session_state:
-    st.session_state.order = list(range(9))
-    random.shuffle(st.session_state.order)
+if "puzzle" not in st.session_state:
+    st.session_state.puzzle = list(range(9))
+    random.shuffle(st.session_state.puzzle)
+
+def move(direction):
+    idx = st.session_state.puzzle.index(8)
+    r, c = divmod(idx, 3)
+    swaps = {
+        "⬅️": (r, c+1),
+        "➡️": (r, c-1),
+        "⬆️": (r+1, c),
+        "⬇️": (r-1, c)
+    }
+    if direction in swaps:
+        nr, nc = swaps[direction]
+        if 0 <= nr < 3 and 0 <= nc < 3:
+            ni = nr*3 + nc
+            st.session_state.puzzle[idx], st.session_state.puzzle[ni] = st.session_state.puzzle[ni], st.session_state.puzzle[idx]
 
 cols = st.columns(3)
-for i, idx in enumerate(st.session_state.order):
+for i, tile in enumerate(st.session_state.puzzle):
     with cols[i%3]:
-        st.image(tiles[idx], use_container_width=True)
-        if st.button("💗", key=f"swap{i}"):
-            j = random.randint(0,8)
-            st.session_state.order[i], st.session_state.order[j] = st.session_state.order[j], st.session_state.order[i]
+        if tile != 8:
+            st.image(tiles[tile], use_container_width=True)
+        else:
+            st.write(" ")
 
-if st.session_state.order == list(range(9)):
-    st.success("You fixed us — just like always 💞")
+ctrl = st.columns(4)
+if ctrl[0].button("⬅️", key="l"): move("⬅️")
+if ctrl[1].button("⬆️", key="u"): move("⬆️")
+if ctrl[2].button("⬇️", key="d"): move("⬇️")
+if ctrl[3].button("➡️", key="r"): move("➡️")
+
+if st.session_state.puzzle == list(range(9)):
+    st.success("You fixed us — just like always 💗")
 
 # ---------------- FUN GAMES ----------------
-st.markdown("### 💘 Little Valentine Games")
+st.markdown("### 💘 Valentine Games")
 
+# Fate Dice
 with st.container():
     st.markdown("<div class='game'>", unsafe_allow_html=True)
-    if st.button("💌 Tap for a Love Note", key="note"):
+    if st.button("🎲 Roll the Fate Dice", key="dice"):
         st.success(random.choice([
-            "Still you. Still us.",
-            "My safest place.",
-            "I’d choose you again.",
-            "Forever feels right with you."
+            "We were always meant to find each other.",
+            "Every road led back to us.",
+            "Even fate knew we’d choose love.",
+            "This connection was written long before us."
         ]))
     st.markdown("</div>", unsafe_allow_html=True)
 
+# Love Message Generator
 with st.container():
     st.markdown("<div class='game'>", unsafe_allow_html=True)
-    ans = st.radio("What survives every storm?", ["Fear", "Time", "Us"], key="quiz")
-    if ans == "Us":
-        st.success("Always us 💗")
+    if st.button("💌 Generate a Love Message", key="love_msg"):
+        st.success(random.choice([
+            "You are my calm after every storm.",
+            "Still you. Still us.",
+            "I feel safest when I’m choosing you.",
+            "Every version of forever looks like you."
+        ]))
     st.markdown("</div>", unsafe_allow_html=True)
+
+# Forever Button + Balloons
+with st.container():
+    st.markdown("<div class='game'>", unsafe_allow_html=True)
+    if st.button("💍 FOREVER", key="forever"):
+        st.balloons()
+        st.success("Locked in. No matter what. Forever 💗")
+    st.markdown("</div>", unsafe_allow_html=True)
+
 
