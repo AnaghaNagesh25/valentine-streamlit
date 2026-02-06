@@ -191,49 +191,7 @@ again, again, and forever.
 </div>
 """, unsafe_allow_html=True)
 
-# ---------------- SMALL SLIDING PUZZLE ----------------
-st.markdown("### 🧩 Put Us Back Together")
 
-img = Image.open("buhb.jpeg").resize((240,240))
-tiles = np.array(img).reshape(3,80,3,80,3).swapaxes(1,2).reshape(-1,80,80,3)
-
-if "puzzle" not in st.session_state:
-    st.session_state.puzzle = list(range(9))
-    random.shuffle(st.session_state.puzzle)
-
-def move(direction):
-    idx = st.session_state.puzzle.index(8)
-    r, c = divmod(idx, 3)
-    swaps = {
-        "⬅️": (r, c+1),
-        "➡️": (r, c-1),
-        "⬆️": (r+1, c),
-        "⬇️": (r-1, c)
-    }
-    if direction in swaps:
-        nr, nc = swaps[direction]
-        if 0 <= nr < 3 and 0 <= nc < 3:
-            ni = nr*3 + nc
-            st.session_state.puzzle[idx], st.session_state.puzzle[ni] = st.session_state.puzzle[ni], st.session_state.puzzle[idx]
-
-cols = st.columns(3)
-for i, tile in enumerate(st.session_state.puzzle):
-    with cols[i%3]:
-        if tile != 8:
-            st.image(tiles[tile], use_container_width=True)
-        else:
-            st.write(" ")
-
-ctrl = st.columns(4)
-if ctrl[0].button("⬅️", key="l"): move("⬅️")
-if ctrl[1].button("⬆️", key="u"): move("⬆️")
-if ctrl[2].button("⬇️", key="d"): move("⬇️")
-if ctrl[3].button("➡️", key="r"): move("➡️")
-
-if st.session_state.puzzle == list(range(9)):
-    st.success("You fixed us — just like always 💗")
-
-#car game
 if st.session_state.puzzle == list(range(9)):
 
 st.markdown("## 💞 Run Toward Each Other")
