@@ -177,46 +177,94 @@ again, again, and forever.
 """, unsafe_allow_html=True)
 
 # ---------------- SMALL SLIDING PUZZLE ----------------
-st.markdown("### 🧩 Put Us Back Together (Mini)")
+st.markdown("## 💕 Find Each Other 💕")
 
-img = Image.open("buhb.jpeg").resize((120,120))
-tiles = np.array(img).reshape(3,40,3,40,3).swapaxes(1,2).reshape(-1,40,40,3)
+# --- Initialize game state ---
+if "car1" not in st.session_state:
+    st.session_state.car1 = [0, 0]      # You
+    st.session_state.car2 = [4, 4]      # Him
+    st.session_state.heart = [2, 2]
+    st.session_state.won = False
 
-if "puzzle" not in st.session_state:
-    st.session_state.puzzle = list(range(9))
-    random.shuffle(st.session_state.puzzle)
+GRID_SIZE = 5
 
-def move(direction):
-    idx = st.session_state.puzzle.index(8)
-    r, c = divmod(idx, 3)
-    swaps = {
-        "⬅️": (r, c+1),
-        "➡️": (r, c-1),
-        "⬆️": (r+1, c),
-        "⬇️": (r-1, c)
-    }
-    if direction in swaps:
-        nr, nc = swaps[direction]
-        if 0 <= nr < 3 and 0 <= nc < 3:
-            ni = nr*3 + nc
-            st.session_state.puzzle[idx], st.session_state.puzzle[ni] = st.session_state.puzzle[ni], st.session_state.puzzle[idx]
+def move(car, direction):
+    if direction == "up" and car[0] > 0:
+        car[0] -= 1
+    elif direction == "down" and car[0] < GRID_SIZE - 1:
+        car[0] += 1
+    elif direction == "left" and car[1] > 0:
+        car[1] -= 1
+    elif direction == "right" and car[1] < GRID_SIZE - 1:
+        car[1] += 1
 
-cols = st.columns(3, gap="small")
-for i, tile in enumerate(st.session_state.puzzle):
-    with cols[i % 3]:
-        if tile != 8:
-            st.image(tiles[tile], width=40)
-        else:
-            st.write(" ")
+# --- Grid display ---
+grid_html = "<div style='display:grid;grid-template-columns:repeat(5,50px);gap:6px;justify-content:center;'>"
 
-ctrl = st.columns(4)
-if ctrl[0].button("⬅️", key="mini_l"): move("⬅️")
-if ctrl[1].button("⬆️", key="mini_u"): move("⬆️")
-if ctrl[2].button("⬇️", key="mini_d"): move("⬇️")
-if ctrl[3].button("➡️", key="mini_r"): move("➡️")
+for i in range(GRID_SIZE):
+    for j in range(GRID_SIZE):
+        cell = ""
+        if [i, j] == st.session_state.car1:
+            cell = "🚗"
+        elif [i, j] == st.session_state.car2:
+            cell = "🚙"
+        elif [i, j] == st.session_state.heart:
+            cell = "💖"
 
-if st.session_state.puzzle == list(range(9)):
-    st.success("Tiny puzzle, big us 💗")
+        grid_html += f"""
+        <div style="
+            width:50px;
+            height:50px;
+            background:linear-gradient(145deg,#ffd6e8,#ffb6d5);
+            border-radius:14px;
+            box-shadow:inset 4px 4px 8px #ff9fc7,inset -4px -4px 8px #fff;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:26px;">
+            {cell}
+        </div>
+        """
+
+grid_html += "</div>"
+st.markdown(grid_html, unsafe_allow_html=True)
+
+st.markdown("### 💕 Move *You* (🚗)")
+c1 = st.columns(4)
+if c1[0].button("⬅️", key="c1l"): move(st.session_state.car1, "left")
+if c1[1].button("⬆️", key="c1u"): move(st.session_state.car1, "up")
+if c1[2].button("⬇️", key="c1d"): move(st.session_state.car1, "down")
+if c1[3].button("➡️", key="c1r"): move(st.session_state.car1, "right")
+
+st.markdown("### 💕 Move *Him* (🚙)")
+c2 = st.columns(4)
+if c2[0].button("⬅️", key="c2l"): move(st.session_state.car2, "left")
+if c2[1].button("⬆️", key="c2u"): move(st.session_state.car2, "up")
+if c2[2].button("⬇️", key="c2d"): move(st.session_state.car2, "down")
+if c2[3].button("➡️", key="c2r"): move(st.session_state.car2, "right")
+
+# --- Win condition ---
+if (
+    st.session_state.car1 == st.session_state.heart
+    and st.session_state.car2 == st.session_state.heart
+):
+    st.session_state.won = True
+
+if st.session_state.won:
+    st.markdown("""
+    <div style="
+        margin-top:20px;
+        padding:18px;
+        background:linear-gradient(135deg,#ff8fcf,#ffc1e3);
+        border-radius:20px;
+        text-align:center;
+        font-size:18px;
+        box-shadow:0 10px 25px rgba(255,105,180,0.4);
+        color:#5b0036;">
+        💗 You always find each other.<br>
+        No matter the path. No matter the storm. 💗
+    </div>
+    """, unsafe_allow_html=True)
 
 # ---------------- FUN GAMES ----------------
 st.markdown("### 💘 Valentine Games")
