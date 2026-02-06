@@ -192,7 +192,7 @@ again, again, and forever.
 """, unsafe_allow_html=True)
 
 
-    st.markdown("""# ---------------- SMALL SLIDING PUZZLE ----------------
+st.markdown("""# ---------------- SMALL SLIDING PUZZLE ----------------
 st.markdown("### 🧩 Put Us Back Together")
 
 img = Image.open("buhb.jpeg").resize((240,240))
