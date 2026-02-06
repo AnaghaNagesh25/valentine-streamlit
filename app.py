@@ -233,6 +233,112 @@ if ctrl[3].button("➡️", key="r"): move("➡️")
 if st.session_state.puzzle == list(range(9)):
     st.success("You fixed us — just like always 💗")
 
+#car game
+if st.session_state.puzzle == list(range(9)):
+
+st.markdown("## 💞 Run Toward Each Other")
+
+st.components.v1.html("""
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+canvas {
+  background: linear-gradient(#ffd6eb, #ffb3d1);
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(255,105,180,0.4);
+}
+button {
+  background:#ff8fcf;
+  border:none;
+  padding:10px 18px;
+  border-radius:18px;
+  color:#4b0f2b;
+  font-weight:600;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<canvas id="game" width="700" height="260"></canvas>
+<br><br>
+<div style="text-align:center;">
+<button onclick="jumpGirl()">Girl Jump 💗</button>
+<button onclick="jumpBoy()">Boy Jump 💙</button>
+</div>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const girlImg = new Image();
+girlImg.src = "buhb.jpeg";
+
+const boyImg = new Image();
+boyImg.src = "buhb.jpeg";
+
+const heartImg = new Image();
+heartImg.src = "https://i.imgur.com/Qp5ZQ9M.png";
+
+let girl = {x:60,y:170,vy:0};
+let boy  = {x:140,y:170,vy:0};
+let gravity = 1.2;
+
+let obstacles = [{x:500},{x:650}];
+let heartX = 850;
+let win = false;
+
+function jumpGirl(){ if(girl.y>=170) girl.vy=-15; }
+function jumpBoy(){ if(boy.y>=170) boy.vy=-15; }
+
+function drawChar(img,x,y){
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(x+20,y+20,20,0,Math.PI*2);
+  ctx.clip();
+  ctx.drawImage(img,x,y,40,40);
+  ctx.restore();
+}
+
+function update(){
+  ctx.clearRect(0,0,700,260);
+
+  // Ground
+  ctx.fillStyle="#ff8fcf";
+  ctx.fillRect(0,210,700,50);
+
+  // Physics
+  girl.y+=girl.vy; girl.vy+=gravity;
+  boy.y+=boy.vy; boy.vy+=gravity;
+  if(girl.y>=170){girl.y=170;girl.vy=0;}
+  if(boy.y>=170){boy.y=170;boy.vy=0;}
+
+  // Move world
+  obstacles.forEach(o=>o.x-=2);
+  heartX-=2;
+
+  // Draw obstacles
+  ctx.fillStyle="#ff4fa3";
+  obstacles.forEach(o=>ctx.fillRect(o.x,180,20,30));
+
+  // Draw characters
+  drawChar(girlImg,girl.x,girl.y);
+  drawChar(boyImg,boy.x,boy.y);
+
+  // Draw heart
+  ctx.save();
+  ctx.shadowColor="#ff4fa3";
+  ctx.shadowBlur=20;
+  ctx.drawImage(heartImg,heartX,150,60,60);
+  ctx.restore();
+
+  // Win
+  if(heartX<200 && !win){
+    win=true;
+    ctx
+
+
 # ---------------- FUN GAMES ----------------
 st.markdown("### 💘 Valentine Games")
 
