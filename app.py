@@ -16,48 +16,51 @@ st.markdown("""
 For you, my babyboy 💗
 </h1>
 <p style="text-align:center; font-size:18px; color:#6b2c3e;">
-after everything — still us
+after every storm — still us
 </p>
 """, unsafe_allow_html=True)
 
-# ---------------- DARK ROMANTIC POEM ----------------
+# ---------------- POEM ----------------
 st.markdown("""
 <div style="
-max-width:760px;
+max-width:780px;
 margin: 35px auto;
-background: linear-gradient(145deg, rgba(255,214,232,0.7), rgba(240,180,200,0.5));
+background: linear-gradient(145deg, rgba(255,214,232,0.7), rgba(240,180,200,0.55));
 padding: 40px;
-border-radius: 30px;
+border-radius: 32px;
 text-align: center;
 font-size: 18px;
 color: #4a1f2c;
 line-height:1.75;
-box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+box-shadow: 0 20px 50px rgba(0,0,0,0.15);
 ">
 
 We walked through storms  
-that rewired our bones.  
-The kind that leave no scars you can point to,  
-only quieter hearts  
-and stronger hands.  
+that changed the way we breathe.  
+The kind that teaches your heart  
+how to survive before it learns how to hope.  
 
 There were moments  
-we didn’t feel whole.  
-Moments we learned how to survive  
-before we learned how to hope again.  
+we weren’t soft.  
+Moments we held on quietly,  
+not knowing if the light would return.  
 
-But even when everything else fractured,  
-our love stayed untouched —  
-not innocent,  
-but **pure in the way truth survives fire**.  
+But everything else bent.  
+Everything else cracked.  
+Everything else asked something of us.  
+
+And our love —  
+it stayed untouched.  
+
+Not innocent.  
+Not fragile.  
+But **pure in the way truth survives fire**.  
 
 We didn’t rush the healing.  
-We let the darkness teach us  
+We let the dark teach us  
 how to be gentle again.  
-How to choose softness  
-without losing strength.  
 
-Now, standing in this calm,  
+Now, standing in the calm,  
 I don’t want a love that forgets the past.  
 I want a forever that honors it.  
 
@@ -68,7 +71,7 @@ As long as we remain —
 chosen, steady, unafraid —  
 I will rebuild  
 every lifetime  
-with you. 🤍  
+with you 🤍  
 
 </div>
 """, unsafe_allow_html=True)
@@ -77,8 +80,8 @@ with you. 🤍
 with open("buhb.jpeg", "rb") as f:
     encoded_image = base64.b64encode(f.read()).decode()
 
-# ---------------- 3D HEART WITH IMAGE ----------------
-html_heart = f"""
+# ---------------- 3D PINTEREST SCENE ----------------
+html_scene = f"""
 <!DOCTYPE html>
 <html>
 <head>
@@ -86,7 +89,15 @@ html_heart = f"""
 body {{
   margin: 0;
   overflow: hidden;
-  background: linear-gradient(#fde2e4, #fadadd);
+  background: linear-gradient(-45deg, #ffd6e8, #fbb1c8, #fde2e4, #f8cdda);
+  background-size: 400% 400%;
+  animation: gradientBG 18s ease infinite;
+}}
+
+@keyframes gradientBG {{
+  0% {{ background-position: 0% 50%; }}
+  50% {{ background-position: 100% 50%; }}
+  100% {{ background-position: 0% 50%; }}
 }}
 </style>
 </head>
@@ -97,19 +108,19 @@ body {{
 <script>
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeight, 0.1, 100);
-camera.position.z = 9;
+camera.position.z = 11;
 
 const renderer = new THREE.WebGLRenderer({{ antialias:true, alpha:true }});
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// lights
-scene.add(new THREE.AmbientLight(0xffffff, 0.85));
-const light = new THREE.PointLight(0xff8fab, 1.4);
-light.position.set(5,6,6);
-scene.add(light);
+// Lights
+scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+const pinkLight = new THREE.PointLight(0xff9ecb, 1.6);
+pinkLight.position.set(5,6,6);
+scene.add(pinkLight);
 
-// heart shape
+// ---------------- HEART ----------------
 const heartShape = new THREE.Shape();
 heartShape.moveTo(0, 2);
 heartShape.bezierCurveTo(0, 2, -3, -1, -3, -3);
@@ -117,7 +128,7 @@ heartShape.bezierCurveTo(-3, -6, 0, -7, 0, -4);
 heartShape.bezierCurveTo(0, -7, 3, -6, 3, -3);
 heartShape.bezierCurveTo(3, -1, 0, 2, 0, 2);
 
-const geometry = new THREE.ExtrudeGeometry(heartShape, {{
+const heartGeometry = new THREE.ExtrudeGeometry(heartShape, {{
   depth: 1,
   bevelEnabled: true,
   bevelThickness: 0.6,
@@ -129,29 +140,91 @@ const texture = new THREE.TextureLoader().load(
   "data:image/jpeg;base64,{encoded_image}"
 );
 
-const material = new THREE.MeshPhongMaterial({{
+const heartMaterial = new THREE.MeshPhongMaterial({{
   map: texture,
   emissive: 0xff7aa2,
-  emissiveIntensity: 0.4,
-  shininess: 90,
+  emissiveIntensity: 0.45,
+  shininess: 100,
   side: THREE.DoubleSide
 }});
 
-const heart = new THREE.Mesh(geometry, material);
+const heart = new THREE.Mesh(heartGeometry, heartMaterial);
 heart.scale.set(0.22, 0.22, 0.22);
 heart.rotation.x = Math.PI;
 scene.add(heart);
 
-// animate
+// ---------------- FLOATING PHOTO MEMORY ----------------
+const memoryGeo = new THREE.PlaneGeometry(2.2, 2.8);
+const memoryMat = new THREE.MeshBasicMaterial({{
+  map: texture,
+  transparent: true,
+  opacity: 0.85
+}});
+const memory = new THREE.Mesh(memoryGeo, memoryMat);
+memory.position.set(3.5, 0, -1);
+scene.add(memory);
+
+// ---------------- SWAN-LIKE CURVES ----------------
+function createSwan(xPos) {{
+  const curve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0.6, 1.2, 0),
+    new THREE.Vector3(1.2, 2.4, 0),
+    new THREE.Vector3(0.8, 3.2, 0)
+  ]);
+
+  const points = curve.getPoints(60);
+  const geo = new THREE.BufferGeometry().setFromPoints(points);
+  const mat = new THREE.LineBasicMaterial({{ color: 0xffffff }});
+  const swan = new THREE.Line(geo, mat);
+  swan.position.set(xPos, -2, -2);
+  return swan;
+}
+
+const swanLeft = createSwan(-4);
+const swanRight = createSwan(4);
+scene.add(swanLeft);
+scene.add(swanRight);
+
+// ---------------- FLOATING PARTICLES ----------------
+const particles = [];
+const pGeo = new THREE.SphereGeometry(0.05, 8, 8);
+const pMat = new THREE.MeshBasicMaterial({{ color: 0xffc0cb }});
+
+for (let i = 0; i < 60; i++) {{
+  const p = new THREE.Mesh(pGeo, pMat);
+  p.position.set(
+    (Math.random() - 0.5) * 10,
+    (Math.random() - 0.5) * 6,
+    (Math.random() - 0.5) * 4
+  );
+  particles.push(p);
+  scene.add(p);
+}}
+
+// ---------------- ANIMATION ----------------
 function animate() {{
   requestAnimationFrame(animate);
+
   heart.rotation.y += 0.005;
-  heart.position.y = Math.sin(Date.now() * 0.002) * 0.12;
+  heart.position.y = Math.sin(Date.now()*0.002) * 0.15;
+
+  memory.position.y = Math.sin(Date.now()*0.0015) * 0.25;
+  memory.rotation.y += 0.002;
+
+  swanLeft.rotation.y += 0.003;
+  swanRight.rotation.y -= 0.003;
+
+  particles.forEach(p => {{
+    p.position.y += 0.01;
+    if (p.position.y > 4) p.position.y = -4;
+  }});
+
   renderer.render(scene, camera);
 }}
 animate();
 
-// resize
+// Resize
 window.addEventListener("resize", () => {{
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
@@ -162,21 +235,21 @@ window.addEventListener("resize", () => {{
 </html>
 """
 
-components.html(html_heart, height=650)
+components.html(html_scene, height=700)
 
-# ---------------- GAME 1: LOVE METER ----------------
+# ---------------- GAME: LOVE METER ----------------
 st.markdown("---")
 st.markdown("<h2 style='text-align:center; color:#c94f7c;'>💗 Love Meter</h2>", unsafe_allow_html=True)
 
 if "love" not in st.session_state:
     st.session_state.love = 0
 
-love_msgs = [
+messages = [
     "You feel like safety 🖤",
-    "I trust you with my heart 💞",
+    "I trust you completely 💞",
     "You’re my constant 💗",
     "I choose you — always 💘",
-    "This is forever energy ♾️"
+    "This is forever ♾️"
 ]
 
 cols = st.columns(5)
@@ -184,27 +257,12 @@ for i, col in enumerate(cols):
     with col:
         if st.button("💖", key=f"love_{i}"):
             st.session_state.love = min(5, st.session_state.love + 1)
-            st.toast(love_msgs[st.session_state.love - 1])
+            st.toast(messages[st.session_state.love - 1])
 
 st.markdown(
     f"<h3 style='text-align:center;'>Love Level: {st.session_state.love}/5 💕</h3>",
     unsafe_allow_html=True
 )
-
-# ---------------- GAME 2: COMPLIMENT ----------------
-st.markdown("---")
-st.markdown("<h2 style='text-align:center; color:#c94f7c;'>🖤 Press for a Truth</h2>", unsafe_allow_html=True)
-
-truths = [
-    "You are safe to love",
-    "You are deeply wanted",
-    "You are chosen without hesitation",
-    "You are stronger than your past",
-    "You are my home"
-]
-
-if st.button("✨ Tell me ✨"):
-    st.success(random.choice(truths))
 
 # ---------------- FINAL MESSAGE ----------------
 st.markdown("""
@@ -213,15 +271,16 @@ margin:45px auto;
 max-width:620px;
 background: rgba(255, 214, 232, 0.6);
 padding: 35px;
-border-radius: 25px;
+border-radius: 28px;
 text-align:center;
 color:#4a1f2c;
 font-size:18px;
 ">
-After everything —  
-it’s still you.  
+No matter how many storms come,  
+this stays.  
 
-And it will always be you 🤍  
+You and me.  
+Forever 🤍  
 </div>
 """, unsafe_allow_html=True)
 
