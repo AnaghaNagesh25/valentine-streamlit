@@ -191,84 +191,31 @@ again, again, and forever.
 </div>
 """, unsafe_allow_html=True)
 
-import streamlit as st
-import random
+# ---------- LOVE DINO GAME (STREAMLIT SAFE) ----------
+st.markdown("## 💕 Run Toward Forever")
 
-st.set_page_config(page_title="Tiny Love Car Game", layout="centered")
+if "dino" not in st.session_state:
+    st.session_state.dino = 0
+    st.session_state.heart_pos = 6
+    st.session_state.over = False
 
-# ---------- STYLES ----------
-st.markdown("""
-<style>
-body { background:#ffe6f2; }
-.game-wrap { width:260px; margin:auto; }
-.grid { display:grid; grid-template-columns:repeat(5, 44px); grid-gap:6px; }
-.tile {
-  width:44px; height:44px; border-radius:10px;
-  background:linear-gradient(145deg,#ff9acb,#ff6fb3);
-  box-shadow:6px 6px 12px rgba(0,0,0,.18), -4px -4px 10px rgba(255,255,255,.6);
-  display:flex; align-items:center; justify-content:center; font-size:20px;
-}
-.road { background:linear-gradient(145deg,#ffd1e8,#ffb6da); }
-.heart { background:linear-gradient(145deg,#ff4f9a,#ff86bf); color:white; }
-.msg { background:#ffd1e8; padding:10px; border-radius:14px; text-align:center; color:#7a1c4b; font-weight:600; margin-top:8px; }
-.controls { display:flex; gap:6px; justify-content:center; margin-top:8px; }
-</style>
-""", unsafe_allow_html=True)
+cols = st.columns(8)
+for i in range(8):
+    if i == st.session_state.dino:
+        cols[i].image("buhb.jpeg", width=60)
+    elif i == st.session_state.heart_pos:
+        cols[i].markdown("💖")
+    else:
+        cols[i].markdown(" ")
 
-# ---------- STATE ----------
-if "p1" not in st.session_state:
-    st.session_state.p1 = [0, 2]
-    st.session_state.p2 = [4, 2]
-    st.session_state.heart = [2, 2]
+if not st.session_state.over:
+    if st.button("➡️ Jump Toward Love"):
+        st.session_state.dino += 1
+        if st.session_state.dino >= st.session_state.heart_pos:
+            st.session_state.over = True
 
-# ---------- HELPERS ----------
-def move(player, dx, dy):
-    p = st.session_state.p1 if player == 1 else st.session_state.p2
-    nx, ny = p[0] + dx, p[1] + dy
-    if 0 <= nx < 5 and 0 <= ny < 5:
-        p[0], p[1] = nx, ny
-
-# ---------- UI ----------
-st.markdown("<div class='game-wrap'>", unsafe_allow_html=True)
-st.markdown("### 🚗💗 Tiny Love Car Game")
-
-# GRID
-st.markdown("<div class='grid'>", unsafe_allow_html=True)
-for y in range(5):
-    for x in range(5):
-        icon = ""
-        cls = "tile road"
-        if [x, y] == st.session_state.heart:
-            icon = "💗"
-            cls = "tile heart"
-        if [x, y] == st.session_state.p1:
-            icon = "🚗"
-        if [x, y] == st.session_state.p2:
-            icon = "🚙"
-        st.markdown(f"<div class='{cls}'>{icon}</div>", unsafe_allow_html=True)
-st.markdown("</div>", unsafe_allow_html=True)
-
-# CONTROLS
-st.markdown("<div class='controls'>", unsafe_allow_html=True)
-col1, col2 = st.columns(2)
-with col1:
-    st.button("⬆️", on_click=move, args=(1, 0, -1))
-    st.button("⬅️", on_click=move, args=(1, -1, 0))
-    st.button("➡️", on_click=move, args=(1, 1, 0))
-    st.button("⬇️", on_click=move, args=(1, 0, 1))
-with col2:
-    st.button("⬆️ ", on_click=move, args=(2, 0, -1))
-    st.button("⬅️ ", on_click=move, args=(2, -1, 0))
-    st.button("➡️ ", on_click=move, args=(2, 1, 0))
-    st.button("⬇️ ", on_click=move, args=(2, 0, 1))
-st.markdown("</div>", unsafe_allow_html=True)
-
-# WIN
-if st.session_state.p1 == st.session_state.heart and st.session_state.p2 == st.session_state.heart:
-    st.markdown("<div class='msg'>Two paths. One heart. 💞</div>", unsafe_allow_html=True)
-
-st.markdown("</div>", unsafe_allow_html=True)
-
+if st.session_state.over:
+    st.success("💗 You always reach each other 💗")
 
 
 # ---------------- FUN GAMES ----------------
