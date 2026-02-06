@@ -177,10 +177,10 @@ again, again, and forever.
 """, unsafe_allow_html=True)
 
 # ---------------- SMALL SLIDING PUZZLE ----------------
-st.markdown("### 🧩 Put Us Back Together")
+st.markdown("### 🧩 Put Us Back Together (Mini)")
 
-img = Image.open("buhb.jpeg").resize((240,240))
-tiles = np.array(img).reshape(3,80,3,80,3).swapaxes(1,2).reshape(-1,80,80,3)
+img = Image.open("buhb.jpeg").resize((120,120))
+tiles = np.array(img).reshape(3,40,3,40,3).swapaxes(1,2).reshape(-1,40,40,3)
 
 if "puzzle" not in st.session_state:
     st.session_state.puzzle = list(range(9))
@@ -201,22 +201,22 @@ def move(direction):
             ni = nr*3 + nc
             st.session_state.puzzle[idx], st.session_state.puzzle[ni] = st.session_state.puzzle[ni], st.session_state.puzzle[idx]
 
-cols = st.columns(3)
+cols = st.columns(3, gap="small")
 for i, tile in enumerate(st.session_state.puzzle):
-    with cols[i%3]:
+    with cols[i % 3]:
         if tile != 8:
-            st.image(tiles[tile], use_container_width=True)
+            st.image(tiles[tile], width=40)
         else:
             st.write(" ")
 
 ctrl = st.columns(4)
-if ctrl[0].button("⬅️", key="l"): move("⬅️")
-if ctrl[1].button("⬆️", key="u"): move("⬆️")
-if ctrl[2].button("⬇️", key="d"): move("⬇️")
-if ctrl[3].button("➡️", key="r"): move("➡️")
+if ctrl[0].button("⬅️", key="mini_l"): move("⬅️")
+if ctrl[1].button("⬆️", key="mini_u"): move("⬆️")
+if ctrl[2].button("⬇️", key="mini_d"): move("⬇️")
+if ctrl[3].button("➡️", key="mini_r"): move("➡️")
 
 if st.session_state.puzzle == list(range(9)):
-    st.success("You fixed us — just like always 💗")
+    st.success("Tiny puzzle, big us 💗")
 
 # ---------------- FUN GAMES ----------------
 st.markdown("### 💘 Valentine Games")
