@@ -1,248 +1,510 @@
 import streamlit as st
+import base64
 import random
-import streamlit.components.v1 as components
+from PIL import Image
+import numpy as np
 
 st.set_page_config(page_title="For You, My Babyboy 💗", layout="wide")
 
-# ------------------- GLOBAL PINK STYLE -------------------
+# ---------------- LOAD IMAGE ----------------
+def load_base64(path):
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+img_b64 = load_base64("buhb.jpeg")
+
+# ---------------- STYLES ----------------
 st.markdown("""
 <style>
-html, body, [class*="css"] {
-    background: linear-gradient(180deg,#ffd6eb,#ffb3d1);
+html, body {
+    background:
+        radial-gradient(circle at 15% 25%, #ffd6eb 0%, transparent 35%),
+        radial-gradient(circle at 85% 35%, #ffc1dc 0%, transparent 40%),
+        radial-gradient(circle at 50% 85%, #ffb3d1 0%, transparent 45%),
+        linear-gradient(180deg, #ffe6f2, #ffd1e8);
+    background-size: 300% 300%;
+    animation: bgFloat 18s ease infinite;
+    font-family: 'Georgia', serif;
 }
-h1,h2,h3,p {
-    color:#5b0036;
+
+@keyframes bgFloat {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+
+.title {
+    text-align: center;
+    font-size: 3rem;
+    color: #7a1c4b;
+    margin: 20px 0;
+}
+
+.card {
+    background: rgba(255, 240, 248, 0.88);
+    padding: 28px;
+    border-radius: 24px;
+    box-shadow: 0 25px 45px rgba(255,105,180,0.3);
+    margin: 25px auto;
+    max-width: 900px;
+}
+
+.game {
+    background: rgba(255,240,248,0.92);
+    padding: 22px;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(255,105,180,0.3);
+    margin-bottom: 22px;
+}
+
+button {
+    background-color: #ff9acb !important;
+    color: #4b0f2b !important;
+    border-radius: 14px !important;
+    font-weight: 600;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ------------------- TITLE -------------------
-st.markdown("<h1 style='text-align:center;'>For You, My Babyboy 💞</h1>", unsafe_allow_html=True)
+st.markdown("<div class='title'>For You, My Babyboy 💗</div>", unsafe_allow_html=True)
 
-# ------------------- POEM (UNCHANGED) -------------------
-st.markdown("""
-<div style="max-width:750px;margin:auto;padding:25px;
-background:rgba(255,214,235,0.75);
-border-radius:24px;
-box-shadow:0 20px 40px rgba(255,105,180,0.35);">
-
-<p>
-We walked through storms that left no witnesses,<br>
-winds that tried to rewrite who we were.
-</p>
-
-<p>
-We learned how to stay soft<br>
-in a world that asked us to harden.
-</p>
-
-<p>
-Everything else bent.<br>
-Everything else broke.
-</p>
-
-<p>
-But our love —<br>
-untouched, unpolluted —<br>
-stood exactly where the storm gave up.
-</p>
-
-<p>
-We didn’t rush the healing.<br>
-We let time teach us gentleness again.
-</p>
-
-<p>
-And now, in the quiet after the chaos,<br>
-I don’t want a beginning that forgets the past.<br>
-I want a forever that remembers<br>
-what it took to arrive here.
-</p>
-
-<p>
-If the world falls apart again,<br>
-let it.
-</p>
-
-<p>
-As long as it’s you and me,<br>
-I will choose this love —<br>
-again, again, and forever.
-</p>
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown("---")
-
-# ------------------- 3D ROTATING HEART (BIG) -------------------
-components.html("""
-<div style="display:flex;justify-content:center;">
-<canvas id="heart" width="420" height="420"></canvas>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+# ---------------- 3D HEART + SWANS ----------------
+st.components.v1.html("""
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body style="margin:0; overflow:hidden;">
 <script>
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45,1,0.1,1000);
-const renderer = new THREE.WebGLRenderer({alpha:true,canvas:document.getElementById("heart")});
-renderer.setSize(420,420);
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 1000);
+camera.position.z = 6;
 
-const shape = new THREE.Shape();
-shape.moveTo(0,0);
-shape.bezierCurveTo(0,0,0,-3,-3,-3);
-shape.bezierCurveTo(-6,-3,-6,3,-6,3);
-shape.bezierCurveTo(-6,7,-3,9,0,12);
-shape.bezierCurveTo(3,9,6,7,6,3);
-shape.bezierCurveTo(6,3,6,-3,3,-3);
-shape.bezierCurveTo(1,-3,0,0,0,0);
+const renderer = new THREE.WebGLRenderer({alpha:true});
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-const geometry = new THREE.ExtrudeGeometry(shape,{depth:3,bevelEnabled:true,bevelSize:0.6});
-const material = new THREE.MeshStandardMaterial({color:0xff5fa2});
-const heart = new THREE.Mesh(geometry,material);
-scene.add(heart);
-
-const light = new THREE.PointLight(0xffffff,1);
-light.position.set(10,10,10);
+scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+const light = new THREE.PointLight(0xffffff, 1.6);
+light.position.set(5,5,5);
 scene.add(light);
 
-camera.position.z = 18;
+// Heart
+const shape = new THREE.Shape();
+shape.moveTo(0,0);
+shape.bezierCurveTo(0,0,-2,-2,-4,0);
+shape.bezierCurveTo(-6,3,-3,6,0,7);
+shape.bezierCurveTo(3,6,6,3,4,0);
+shape.bezierCurveTo(2,-2,0,0,0,0);
+
+const geo = new THREE.ExtrudeGeometry(shape,{
+    depth:0.8,
+    bevelEnabled:true,
+    bevelThickness:0.3,
+    bevelSize:0.3,
+    bevelSegments:10
+});
+
+const texture = new THREE.TextureLoader().load("data:image/jpeg;base64,{{IMG}}");
+const mat = new THREE.MeshStandardMaterial({map:texture, roughness:0.35, metalness:0.3});
+const heart = new THREE.Mesh(geo, mat);
+heart.scale.set(0.45,0.45,0.45);
+scene.add(heart);
+
+// Swan curves
+function swan(x) {
+    const curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(x,0,0),
+        new THREE.Vector3(x/2,1.3,0),
+        new THREE.Vector3(0,0.4,0)
+    ]);
+    const g = new THREE.TubeGeometry(curve,60,0.06,8,false);
+    const m = new THREE.MeshStandardMaterial({color:0xffffff});
+    const s = new THREE.Mesh(g,m);
+    scene.add(s);
+    return s;
+}
+
+const swanL = swan(-5);
+const swanR = swan(5);
 
 function animate(){
     requestAnimationFrame(animate);
     heart.rotation.y += 0.01;
     heart.rotation.x += 0.005;
+    swanL.position.x += 0.012;
+    swanR.position.x -= 0.012;
     renderer.render(scene,camera);
 }
 animate();
 </script>
-""", height=460)
+</body>
+</html>
+""".replace("{{IMG}}", img_b64), height=600)
 
-st.markdown("---")
+# ---------------- POEM (UNCHANGED) ----------------
+st.markdown("""
+<div class="card">
+We walked through storms that left no witnesses,<br>
+winds that tried to rewrite who we were.<br><br>
 
-# ------------------- MINI DINO-STYLE LOVE GAME -------------------
-st.markdown("## 💗 Run Toward Forever")
+We learned how to stay soft<br>
+in a world that asked us to harden.<br><br>
 
-components.html("""
-<canvas id="game" width="720" height="260"></canvas>
-<br>
-<div style="text-align:center;">
-<button onclick="jumpGirl()">She jumps 💖</button>
-<button onclick="jumpBoy()">He jumps 💙</button>
+Everything else bent.<br>
+Everything else broke.<br><br>
+
+But our love —<br>
+untouched, unpolluted —<br>
+stood exactly where the storm gave up.<br><br>
+
+We didn’t rush the healing.<br>
+We let time teach us gentleness again.<br><br>
+
+And now, in the quiet after the chaos,<br>
+I don’t want a beginning that forgets the past.<br>
+I want a forever that remembers<br>
+what it took to arrive here.<br><br>
+
+If the world falls apart again,<br>
+let it.<br><br>
+
+As long as it’s you and me,<br>
+I will choose this love —<br>
+again, again, and forever.
 </div>
+""", unsafe_allow_html=True)
 
+# ---------------- SMALL SLIDING PUZZLE ----------------
+st.markdown("### 🧩 Put Us Back Together")
+
+img = Image.open("buhb.jpeg").resize((240,240))
+tiles = np.array(img).reshape(3,80,3,80,3).swapaxes(1,2).reshape(-1,80,80,3)
+
+if "puzzle" not in st.session_state:
+    st.session_state.puzzle = list(range(9))
+    random.shuffle(st.session_state.puzzle)
+
+def move(direction):
+    idx = st.session_state.puzzle.index(8)
+    r, c = divmod(idx, 3)
+    swaps = {
+        "⬅️": (r, c+1),
+        "➡️": (r, c-1),
+        "⬆️": (r+1, c),
+        "⬇️": (r-1, c)
+    }
+    if direction in swaps:
+        nr, nc = swaps[direction]
+        if 0 <= nr < 3 and 0 <= nc < 3:
+            ni = nr*3 + nc
+            st.session_state.puzzle[idx], st.session_state.puzzle[ni] = st.session_state.puzzle[ni], st.session_state.puzzle[idx]
+
+cols = st.columns(3)
+for i, tile in enumerate(st.session_state.puzzle):
+    with cols[i%3]:
+        if tile != 8:
+            st.image(tiles[tile], use_container_width=True)
+        else:
+            st.write(" ")
+
+ctrl = st.columns(4)
+if ctrl[0].button("⬅️", key="l"): move("⬅️")
+if ctrl[1].button("⬆️", key="u"): move("⬆️")
+if ctrl[2].button("⬇️", key="d"): move("⬇️")
+if ctrl[3].button("➡️", key="r"): move("➡️")
+
+if st.session_state.puzzle == list(range(9)):
+    st.success("You fixed us — just like always 💗")
+
+# ---------------- FUN GAMES ----------------
+st.markdown("### 💘 Valentine Games")
+
+# Fate Dice
+with st.container():
+    st.markdown("<div class='game'>", unsafe_allow_html=True)
+    if st.button("🎲 Roll the Fate Dice", key="dice"):
+        st.success(random.choice([
+            "We were always meant to find each other.",
+            "Every road led back to us.",
+            "Even fate knew we’d choose love.",
+            "This connection was written long before us."
+        ]))
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# Love Message Generator
+with st.container():
+    st.markdown("<div class='game'>", unsafe_allow_html=True)
+    if st.button("💌 Generate a Love Message", key="love_msg"):
+        st.success(random.choice([
+            "You are my calm after every storm.",
+            "Still you. Still us.",
+            "I feel safest when I’m choosing you.",
+            "Every version of forever looks like you."
+        ]))
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# Forever Button + Balloons
+with st.container():
+    st.markdown("<div class='game'>", unsafe_allow_html=True)
+    if st.button("💍 FOREVER", key="forever"):
+        st.balloons()
+        st.success("Locked in. No matter what. Forever 💗")
+    st.markdown("</div>", unsafe_allow_html=True) change the output of fun games all 3 to pink color instead of green n make it dino game with the 2 characters in picture reaching a heart and obstacles between separate the girl and boy from picture make it like guy and girl are trying toi reac h eo the game separate both from image make them individuals trying to reCh each other to the heartimport streamlit as st
+import base64
+import random
+from PIL import Image
+import numpy as np
+
+st.set_page_config(page_title="For You, My Babyboy 💗", layout="wide")
+
+# ---------------- LOAD IMAGE ----------------
+def load_base64(path):
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+img_b64 = load_base64("buhb.jpeg")
+
+# ---------------- STYLES ----------------
+st.markdown("""
 <style>
-button{
-background:#ff8fcf;
-border:none;
-padding:10px 18px;
-margin:8px;
-border-radius:18px;
-font-weight:600;
-color:#4b0f2b;
-cursor:pointer;
+html, body {
+    background:
+        radial-gradient(circle at 15% 25%, #ffd6eb 0%, transparent 35%),
+        radial-gradient(circle at 85% 35%, #ffc1dc 0%, transparent 40%),
+        radial-gradient(circle at 50% 85%, #ffb3d1 0%, transparent 45%),
+        linear-gradient(180deg, #ffe6f2, #ffd1e8);
+    background-size: 300% 300%;
+    animation: bgFloat 18s ease infinite;
+    font-family: 'Georgia', serif;
+}
+
+@keyframes bgFloat {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+
+.title {
+    text-align: center;
+    font-size: 3rem;
+    color: #7a1c4b;
+    margin: 20px 0;
+}
+
+.card {
+    background: rgba(255, 240, 248, 0.88);
+    padding: 28px;
+    border-radius: 24px;
+    box-shadow: 0 25px 45px rgba(255,105,180,0.3);
+    margin: 25px auto;
+    max-width: 900px;
+}
+
+.game {
+    background: rgba(255,240,248,0.92);
+    padding: 22px;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(255,105,180,0.3);
+    margin-bottom: 22px;
+}
+
+button {
+    background-color: #ff9acb !important;
+    color: #4b0f2b !important;
+    border-radius: 14px !important;
+    font-weight: 600;
 }
 </style>
+""", unsafe_allow_html=True)
 
+st.markdown("<div class='title'>For You, My Babyboy 💗</div>", unsafe_allow_html=True)
+
+# ---------------- 3D HEART + SWANS ----------------
+st.components.v1.html("""
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body style="margin:0; overflow:hidden;">
 <script>
-const c = document.getElementById("game");
-const ctx = c.getContext("2d");
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 1000);
+camera.position.z = 6;
 
-const img = new Image();
-img.src = "buhb.jpeg";
+const renderer = new THREE.WebGLRenderer({alpha:true});
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-let g={x:80,y:170,v:0};
-let b={x:160,y:170,v:0};
-let grav=1.1;
-let obs=[{x:500},{x:650}];
-let heartX=820;
-let won=false;
+scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+const light = new THREE.PointLight(0xffffff, 1.6);
+light.position.set(5,5,5);
+scene.add(light);
 
-function jumpGirl(){ if(g.y>=170) g.v=-15; }
-function jumpBoy(){ if(b.y>=170) b.v=-15; }
+// Heart
+const shape = new THREE.Shape();
+shape.moveTo(0,0);
+shape.bezierCurveTo(0,0,-2,-2,-4,0);
+shape.bezierCurveTo(-6,3,-3,6,0,7);
+shape.bezierCurveTo(3,6,6,3,4,0);
+shape.bezierCurveTo(2,-2,0,0,0,0);
 
-function drawChar(x,y){
- ctx.save();
- ctx.beginPath();
- ctx.arc(x+20,y+20,20,0,Math.PI*2);
- ctx.clip();
- ctx.drawImage(img,x,y,40,40);
- ctx.restore();
+const geo = new THREE.ExtrudeGeometry(shape,{
+    depth:0.8,
+    bevelEnabled:true,
+    bevelThickness:0.3,
+    bevelSize:0.3,
+    bevelSegments:10
+});
+
+const texture = new THREE.TextureLoader().load("data:image/jpeg;base64,{{IMG}}");
+const mat = new THREE.MeshStandardMaterial({map:texture, roughness:0.35, metalness:0.3});
+const heart = new THREE.Mesh(geo, mat);
+heart.scale.set(0.45,0.45,0.45);
+scene.add(heart);
+
+// Swan curves
+function swan(x) {
+    const curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(x,0,0),
+        new THREE.Vector3(x/2,1.3,0),
+        new THREE.Vector3(0,0.4,0)
+    ]);
+    const g = new THREE.TubeGeometry(curve,60,0.06,8,false);
+    const m = new THREE.MeshStandardMaterial({color:0xffffff});
+    const s = new THREE.Mesh(g,m);
+    scene.add(s);
+    return s;
 }
 
-function loop(){
- ctx.clearRect(0,0,720,260);
+const swanL = swan(-5);
+const swanR = swan(5);
 
- ctx.fillStyle="#ff8fcf";
- ctx.fillRect(0,210,720,50);
-
- g.y+=g.v; g.v+=grav;
- b.y+=b.v; b.v+=grav;
- if(g.y>170){g.y=170;g.v=0;}
- if(b.y>170){b.y=170;b.v=0;}
-
- obs.forEach(o=>o.x-=2);
- heartX-=2;
-
- ctx.fillStyle="#ff4fa3";
- obs.forEach(o=>ctx.fillRect(o.x,180,20,30));
-
- drawChar(g.x,g.y);
- drawChar(b.x,b.y);
-
- ctx.font="40px serif";
- ctx.fillText("💗",heartX,190);
-
- if(heartX<200 && !won){
-   won=true;
-   ctx.fillStyle="#5b0036";
-   ctx.font="28px serif";
-   ctx.fillText("Forever reached 💞",230,120);
- }
- requestAnimationFrame(loop);
+function animate(){
+    requestAnimationFrame(animate);
+    heart.rotation.y += 0.01;
+    heart.rotation.x += 0.005;
+    swanL.position.x += 0.012;
+    swanR.position.x -= 0.012;
+    renderer.render(scene,camera);
 }
-loop();
+animate();
 </script>
-""", height=360)
+</body>
+</html>
+""".replace("{{IMG}}", img_b64), height=600)
 
-st.markdown("---")
+# ---------------- POEM (UNCHANGED) ----------------
+st.markdown("""
+<div class="card">
+We walked through storms that left no witnesses,<br>
+winds that tried to rewrite who we were.<br><br>
 
-# ------------------- PINK RESULT CARD -------------------
-def pink_result(text):
-    st.markdown(f"""
-    <div style="
-    background:#ffd6eb;
-    padding:15px;
-    border-radius:18px;
-    box-shadow:0 10px 25px rgba(255,105,180,0.35);
-    color:#5b0036;
-    text-align:center;
-    font-weight:600;">
-    {text}
-    </div>
-    """, unsafe_allow_html=True)
+We learned how to stay soft<br>
+in a world that asked us to harden.<br><br>
 
-# ------------------- FUN GAMES -------------------
-st.markdown("## 💕 Little Valentine Games")
+Everything else bent.<br>
+Everything else broke.<br><br>
 
-if st.button("🎲 Fate Dice"):
-    pink_result(random.choice([
-        "Even fate bent so we could meet.",
-        "Every road led back to us.",
-        "This love was written long before us.",
-        "No matter the timeline — it’s you."
-    ]))
+But our love —<br>
+untouched, unpolluted —<br>
+stood exactly where the storm gave up.<br><br>
 
-if st.button("💌 Love Message"):
-    pink_result(random.choice([
-        "You are my calm after every storm.",
-        "Still you. Still us.",
-        "I’d choose you in every lifetime.",
-        "My safest place is loving you."
-    ]))
+We didn’t rush the healing.<br>
+We let time teach us gentleness again.<br><br>
 
-if st.button("♾️ FOREVER"):
-    st.balloons()
-    pink_result("Again. Again. And forever 💗")
+And now, in the quiet after the chaos,<br>
+I don’t want a beginning that forgets the past.<br>
+I want a forever that remembers<br>
+what it took to arrive here.<br><br>
+
+If the world falls apart again,<br>
+let it.<br><br>
+
+As long as it’s you and me,<br>
+I will choose this love —<br>
+again, again, and forever.
+</div>
+""", unsafe_allow_html=True)
+
+# ---------------- SMALL SLIDING PUZZLE ----------------
+st.markdown("### 🧩 Put Us Back Together")
+
+img = Image.open("buhb.jpeg").resize((240,240))
+tiles = np.array(img).reshape(3,80,3,80,3).swapaxes(1,2).reshape(-1,80,80,3)
+
+if "puzzle" not in st.session_state:
+    st.session_state.puzzle = list(range(9))
+    random.shuffle(st.session_state.puzzle)
+
+def move(direction):
+    idx = st.session_state.puzzle.index(8)
+    r, c = divmod(idx, 3)
+    swaps = {
+        "⬅️": (r, c+1),
+        "➡️": (r, c-1),
+        "⬆️": (r+1, c),
+        "⬇️": (r-1, c)
+    }
+    if direction in swaps:
+        nr, nc = swaps[direction]
+        if 0 <= nr < 3 and 0 <= nc < 3:
+            ni = nr*3 + nc
+            st.session_state.puzzle[idx], st.session_state.puzzle[ni] = st.session_state.puzzle[ni], st.session_state.puzzle[idx]
+
+cols = st.columns(3)
+for i, tile in enumerate(st.session_state.puzzle):
+    with cols[i%3]:
+        if tile != 8:
+            st.image(tiles[tile], use_container_width=True)
+        else:
+            st.write(" ")
+
+ctrl = st.columns(4)
+if ctrl[0].button("⬅️", key="l"): move("⬅️")
+if ctrl[1].button("⬆️", key="u"): move("⬆️")
+if ctrl[2].button("⬇️", key="d"): move("⬇️")
+if ctrl[3].button("➡️", key="r"): move("➡️")
+
+if st.session_state.puzzle == list(range(9)):
+    st.success("You fixed us — just like always 💗")
+
+# ---------------- FUN GAMES ----------------
+st.markdown("### 💘 Valentine Games")
+
+# Fate Dice
+with st.container():
+    st.markdown("<div class='game'>", unsafe_allow_html=True)
+    if st.button("🎲 Roll the Fate Dice", key="dice"):
+        st.success(random.choice([
+            "We were always meant to find each other.",
+            "Every road led back to us.",
+            "Even fate knew we’d choose love.",
+            "This connection was written long before us."
+        ]))
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# Love Message Generator
+with st.container():
+    st.markdown("<div class='game'>", unsafe_allow_html=True)
+    if st.button("💌 Generate a Love Message", key="love_msg"):
+        st.success(random.choice([
+            "You are my calm after every storm.",
+            "Still you. Still us.",
+            "I feel safest when I’m choosing you.",
+            "Every version of forever looks like you."
+        ]))
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# Forever Button + Balloons
+with st.container():
+    st.markdown("<div class='game'>", unsafe_allow_html=True)
+    if st.button("💍 FOREVER", key="forever"):
+        st.balloons()
+        st.success("Locked in. No matter what. Forever 💗")
+    st.markdown("</div>", unsafe_allow_html=True) change the output of fun games all 3 to pink color instead of green n make it dino game with the 2 characters in picture reaching a heart and obstacles between separate the girl and boy from picture make it like guy and girl are trying toi reac h eo the game separate both from image make them individuals trying to reCh each other to the heart
 
 
 
