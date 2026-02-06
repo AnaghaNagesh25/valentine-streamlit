@@ -192,119 +192,94 @@ again, again, and forever.
 """, unsafe_allow_html=True)
 
 
-import streamlit.components.v1 as components
+st.markdown("## 💕 Find Each Other 💕")
 
-components.html("""
-<!DOCTYPE html>
-<html>
-<head>
-<style>
-canvas {
-  background: linear-gradient(#ffd1ea, #ff9fcf);
-  border-radius: 20px;
-  box-shadow: 0 15px 30px rgba(255,105,180,0.4);
-}
-button {
-  background:#ff6fae;
-  border:none;
-  padding:12px 20px;
-  border-radius:20px;
-  color:white;
-  font-size:16px;
-  cursor:pointer;
-}
-</style>
-</head>
-<body>
+# --- Initialize game state ---
+if "car1" not in st.session_state:
+    st.session_state.car1 = [0, 0]      # You
+    st.session_state.car2 = [4, 4]      # Him
+    st.session_state.heart = [2, 2]
+    st.session_state.won = False
 
-<h2 style="color:#5b0036;text-align:center;">
-Run Toward Forever 💗
-</h2>
+GRID_SIZE = 5
 
-<canvas id="game" width="600" height="200"></canvas>
-<br><br>
-<div style="text-align:center;">
-<button onclick="jump()">JUMP 💕</button>
-</div>
+def move(car, direction):
+    if direction == "up" and car[0] > 0:
+        car[0] -= 1
+    elif direction == "down" and car[0] < GRID_SIZE - 1:
+        car[0] += 1
+    elif direction == "left" and car[1] > 0:
+        car[1] -= 1
+    elif direction == "right" and car[1] < GRID_SIZE - 1:
+        car[1] += 1
 
-<script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+# --- Grid display ---
+grid_html = "<div style='display:grid;grid-template-columns:repeat(5,50px);gap:6px;justify-content:center;'>"
 
-let y = 140;
-let vy = 0;
-let gravity = 1.2;
-let grounded = true;
-let heartX = 550;
-let gameWon = false;
+for i in range(GRID_SIZE):
+    for j in range(GRID_SIZE):
+        cell = ""
+        if [i, j] == st.session_state.car1:
+            cell = "🚗"
+        elif [i, j] == st.session_state.car2:
+            cell = "🚙"
+        elif [i, j] == st.session_state.heart:
+            cell = "💖"
 
-const playerImg = new Image();
-playerImg.src = "buhb.jpeg";
+        grid_html += f"""
+        <div style="
+            width:50px;
+            height:50px;
+            background:linear-gradient(145deg,#ffd6e8,#ffb6d5);
+            border-radius:14px;
+            box-shadow:inset 4px 4px 8px #ff9fc7,inset -4px -4px 8px #fff;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:26px;">
+            {cell}
+        </div>
+        """
 
-const heartImg = new Image();
-heartImg.src = "https://i.imgur.com/Qp5ZQ9M.png"; // glossy heart
+grid_html += "</div>"
+st.markdown(grid_html, unsafe_allow_html=True)
 
-function jump(){
-  if(grounded){
-    vy = -15;
-    grounded = false;
-  }
-}
+st.markdown("### 💕 Move *You* (🚗)")
+c1 = st.columns(4)
+if c1[0].button("⬅️", key="c1l"): move(st.session_state.car1, "left")
+if c1[1].button("⬆️", key="c1u"): move(st.session_state.car1, "up")
+if c1[2].button("⬇️", key="c1d"): move(st.session_state.car1, "down")
+if c1[3].button("➡️", key="c1r"): move(st.session_state.car1, "right")
 
-function drawHeart(){
-  ctx.save();
-  ctx.translate(heartX, 120);
-  ctx.scale(1.6,1.6);
-  ctx.shadowColor = "#ff4fa3";
-  ctx.shadowBlur = 20;
-  ctx.drawImage(heartImg, -30, -30, 60, 60);
-  ctx.restore();
-}
+st.markdown("### 💕 Move *Him* (🚙)")
+c2 = st.columns(4)
+if c2[0].button("⬅️", key="c2l"): move(st.session_state.car2, "left")
+if c2[1].button("⬆️", key="c2u"): move(st.session_state.car2, "up")
+if c2[2].button("⬇️", key="c2d"): move(st.session_state.car2, "down")
+if c2[3].button("➡️", key="c2r"): move(st.session_state.car2, "right")
 
-function update(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+# --- Win condition ---
+if (
+    st.session_state.car1 == st.session_state.heart
+    and st.session_state.car2 == st.session_state.heart
+):
+    st.session_state.won = True
 
-  // Player physics
-  y += vy;
-  vy += gravity;
-  if(y >= 140){
-    y = 140;
-    vy = 0;
-    grounded = true;
-  }
-
-  // Ground
-  ctx.fillStyle = "#ff8fcf";
-  ctx.fillRect(0,170,600,30);
-
-  // Player
-  ctx.drawImage(playerImg, 50, y, 40, 40);
-
-  // Heart movement
-  if(!gameWon){
-    heartX -= 2;
-  }
-
-  drawHeart();
-
-  // Win condition
-  if(heartX < 90){
-    gameWon = true;
-    ctx.fillStyle = "#5b0036";
-    ctx.font = "20px serif";
-    ctx.fillText("You made it to forever 💗", 180, 90);
-  }
-
-  requestAnimationFrame(update);
-}
-
-update();
-</script>
-
-</body>
-</html>
-""", height=360)
-
+if st.session_state.won:
+    st.markdown("""
+    <div style="
+        margin-top:20px;
+        padding:18px;
+        background:linear-gradient(135deg,#ff8fcf,#ffc1e3);
+        border-radius:20px;
+        text-align:center;
+        font-size:18px;
+        box-shadow:0 10px 25px rgba(255,105,180,0.4);
+        color:#5b0036;">
+        💗 You always find each other.<br>
+        No matter the path. No matter the storm. 💗
+    </div>
+    """, unsafe_allow_html=True)
 
 
 # ---------------- FUN GAMES ----------------
