@@ -27,19 +27,20 @@ We walked through storms that left no witnesses,
 winds that tried to rewrite who we were.  
 
 We learned the language of silence,  
-the weight of staying when leaving felt easier.  
+the courage it takes to stay soft  
+when the world hardens you.  
 
 Everything else bent.  
 Everything else broke.  
 
 But our love —  
-untouched, unpolluted — stayed standing  
-where the storm gave up.  
+untouched, unpolluted —  
+stood exactly where the storm gave up.  
 
-We did not rush the healing.  
-We let the cracks teach us tenderness again.  
+We didn’t rush the healing.  
+We let time teach us gentleness again.  
 
-And now, in this quiet after the chaos,  
+And now, in the quiet after the chaos,  
 I don’t want a beginning that forgets the past.  
 I want a forever that remembers  
 what it took to arrive here.  
@@ -49,11 +50,14 @@ let it.
 
 As long as it’s you and me,  
 I will choose this love —  
-again, and again, and forever.
+again, again, and forever.
 """
 
 with st.expander("🖤 A Poem For Us"):
-    st.markdown(f"<p style='font-size:18px; line-height:1.7'>{poem}</p>", unsafe_allow_html=True)
+    st.markdown(
+        f"<p style='font-size:18px; line-height:1.7'>{poem}</p>",
+        unsafe_allow_html=True
+    )
 
 # ---------------- 3D SCENE ----------------
 html_scene = """
@@ -83,19 +87,19 @@ body {
 <script>
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeight, 0.1, 100);
-camera.position.z = 10;
+camera.position.z = 12;
 
 const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+// Lights
 scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+const pinkLight = new THREE.PointLight(0xff9ecb, 1.6);
+pinkLight.position.set(6,6,6);
+scene.add(pinkLight);
 
-const light = new THREE.PointLight(0xff9ecb, 1.5);
-light.position.set(5,6,6);
-scene.add(light);
-
-// Heart
+// ---------------- HEART ----------------
 const heartShape = new THREE.Shape();
 heartShape.moveTo(0,2);
 heartShape.bezierCurveTo(0,2,-3,-1,-3,-3);
@@ -116,7 +120,7 @@ const texture = new THREE.TextureLoader().load("__IMG__");
 const heartMat = new THREE.MeshPhongMaterial({
   map: texture,
   emissive: 0xff7aa2,
-  emissiveIntensity: 0.4,
+  emissiveIntensity: 0.45,
   shininess: 100
 });
 
@@ -125,7 +129,7 @@ heart.scale.set(0.22,0.22,0.22);
 heart.rotation.x = Math.PI;
 scene.add(heart);
 
-// Floating photo
+// ---------------- FLOATING PHOTO ----------------
 const planeGeo = new THREE.PlaneGeometry(2.2,2.8);
 const planeMat = new THREE.MeshBasicMaterial({
   map: texture,
@@ -133,32 +137,66 @@ const planeMat = new THREE.MeshBasicMaterial({
   opacity: 0.9
 });
 const memory = new THREE.Mesh(planeGeo, planeMat);
-memory.position.set(3.2,0,-1);
+memory.position.set(3.5,0,-1);
 scene.add(memory);
 
-// Swan curves
-function swan(x){
-  const curve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0,0,0),
-    new THREE.Vector3(0.6,1.4,0),
-    new THREE.Vector3(1.2,2.4,0),
-    new THREE.Vector3(0.8,3.2,0)
-  ]);
-  const pts = curve.getPoints(50);
-  const geo = new THREE.BufferGeometry().setFromPoints(pts);
-  const mat = new THREE.LineBasicMaterial({ color: 0xffffff });
-  const line = new THREE.Line(geo, mat);
-  line.position.set(x,-2,-2);
-  return line;
+// ---------------- 3D SWANS ----------------
+function createSwan() {
+  const swan = new THREE.Group();
+
+  const body = new THREE.Mesh(
+    new THREE.SphereGeometry(0.8, 32, 32),
+    new THREE.MeshStandardMaterial({ color: 0xffffff })
+  );
+  body.scale.set(1.2,0.8,1);
+  swan.add(body);
+
+  const neck = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.12,0.18,1.6,32),
+    new THREE.MeshStandardMaterial({ color: 0xffffff })
+  );
+  neck.position.y = 1;
+  neck.rotation.z = Math.PI/6;
+  swan.add(neck);
+
+  const head = new THREE.Mesh(
+    new THREE.SphereGeometry(0.18, 32, 32),
+    new THREE.MeshStandardMaterial({ color: 0xffffff })
+  );
+  head.position.set(0.35,1.9,0);
+  swan.add(head);
+
+  return swan;
 }
 
-scene.add(swan(-4));
-scene.add(swan(4));
+const swanLeft = createSwan();
+swanLeft.position.set(-7, -1.5, -2);
+scene.add(swanLeft);
+
+const swanRight = createSwan();
+swanRight.position.set(7, -1.5, -2);
+swanRight.rotation.y = Math.PI;
+scene.add(swanRight);
+
+// ---------------- ANIMATION ----------------
+let t = 0;
 
 function animate(){
   requestAnimationFrame(animate);
+
   heart.rotation.y += 0.01;
-  memory.rotation.y -= 0.005;
+  memory.rotation.y -= 0.004;
+
+  t += 0.01;
+
+  swanLeft.position.x = -7 + Math.sin(t) * 3;
+  swanLeft.position.y = -1.5 + Math.sin(t*2) * 0.3;
+  swanLeft.rotation.y += 0.01;
+
+  swanRight.position.x = 7 - Math.sin(t) * 3;
+  swanRight.position.y = -1.5 + Math.cos(t*2) * 0.3;
+  swanRight.rotation.y -= 0.01;
+
   renderer.render(scene,camera);
 }
 animate();
@@ -173,7 +211,7 @@ window.addEventListener('resize', () => {
 </html>
 """
 
-html(html_scene.replace("__IMG__", image_src), height=600)
+html(html_scene.replace("__IMG__", image_src), height=620)
 
 # ---------------- GAMES ----------------
 st.markdown("## 💘 Valentine Games")
@@ -181,27 +219,27 @@ st.markdown("## 💘 Valentine Games")
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    if st.button("💌 Love Message"):
-        msgs = [
-            "You are my safest place.",
-            "I choose you, every lifetime.",
+    if st.button("💌 Love Message", key="msg"):
+        st.success(random.choice([
             "Still you. Always you.",
-            "My calm after every storm."
-        ]
-        st.success(random.choice(msgs))
+            "You are my safest place.",
+            "My calm after every storm.",
+            "I choose you — every lifetime."
+        ]))
 
 with col2:
-    if st.button("🎲 Fate Dice"):
+    if st.button("🎲 Fate Dice", key="dice"):
         st.info(random.choice([
-            "Cuddle night incoming 💕",
-            "Movie + snacks date 🍿",
-            "Long hug, no talking 🤍",
+            "Cuddle night 💕",
+            "Movie + snacks 🍿",
+            "Long hug, no words 🤍",
             "Soft love, no rush 🖤"
         ]))
 
 with col3:
-    if st.button("💖 Forever Button"):
+    if st.button("💖 Forever Button", key="forever"):
         st.balloons()
         st.markdown("### It’s always you. 🌙")
+
 
 
